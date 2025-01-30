@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p id="nav" class="no-print" style="width:100%; background-color:080; text-align:right;">
+    &nbsp;
+</p>
+<nav id="pagenav">
+    &nbsp;
+</nav>
+<div id="content">
+    <h1>{{ organame }}</h1>
+    <h2>Mitglieder-Datenbank</h2>
+    <form action='_login' method='POST'>
+        <input type='text' name='username' id='username' placeholder='eMail'>
+        <input type='password' name='password' id='password' placeholder='password'>
+        <input type='submit' name='submit'>
+    </form>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+{% endblock %}

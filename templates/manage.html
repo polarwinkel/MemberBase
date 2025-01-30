@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p id="nav" class="no-print" style="width:100%; background-color:080; text-align:right;">
+    [optional page-nav]
+</p>
+<div id="content">
+    <h1>MemberBase admin</h1>
+    <p>TODO: edit settings here</p>
+    <p><a href="_logout">logout</a></p>
+    <hr>
+    <h2>Alle Mitglieder</h2>
+    <div id="memberlist"></div>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+
+<script>
+    var members = JSON.parse({{ msJson|tojson }});
+    var out = '<table>';
+    out += '<tr><th>Nachname</th><th>Vorname</th><th>Geburtsdatum</th></tr>\n';
+    for (var i=0; i<members.length; i++){
+        out += '<tr>';
+        out += '<td><a href="{{ relroot }}manage/'+members[i].mid+'">Verwalten</a></td>';
+        out += '<td><a href="{{ relroot }}member/'+members[i].mid+'">'+members[i].family_name+'</a></td>';
+        out += '<td>'+members[i].given_name+'</td>';
+        out += '<td>'+members[i].date_of_birth+'</td>';
+        out += '</tr>';
+    }
+    out += '</table>';
+    document.getElementById('memberlist').innerHTML = out;
+</script>
+{% endblock %}

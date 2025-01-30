@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="content">
+    <h1>init</h1>
+    <p>desired admin-password:</p>
+    <form action='{{ path }}' method='POST'>
+        <input type='password' name='password' id='password' placeholder='password'></input>
+        <input type='submit' name='submit'></input>
+    </form>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+
+{% endblock %}

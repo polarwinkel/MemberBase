@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+            <p id="nav" class="no-print" style="width:100%; background-color:080; text-align:right;">
+                <a href="{{ relroot }}">home</a>
+            </p>
+<nav id="pagenav">
+    <p>Logged in as: {{ authuser }} | <a href="{{ relroot }}_logout">Logout</a></p>
+</nav>
+<div id="content">
+    <input type="hidden" class="formdata" name="mid" id="mid"><br>
+    <h1 id="name"></h1>
+    <h2>Adresse:</h2>
+    <label for="street">Straße:</label>
+    <input type="text" class="formdata" name="street" id="street"><br>
+    <label for="street_number">Hausnummer:</label>
+    <input type="text" class="formdata" name="street_number" id="street_number"><br>
+    <label for="appartment">Adresszusatz:</label>
+    <input type="text" class="formdata" name="appartment" id="appartment"><br>
+    <label for="postal_code">PLZ:</label>
+    <input type="text" class="formdata" name="postal_code" id="postal_code"><br>
+    <label for="city">Stadt:</label>
+    <input type="text" class="formdata" name="city" id="city"><br>
+    <h2>Kontakt:</h2>
+    <label for="email">eMail:</label>
+    <input type="text" class="formdata" name="email" id="email"><br>
+    <label for="email">eMail-Verifikation:</label>
+    <input type="text" class="formdata" name="email2" id="email2"><br>
+    <p><i>(zweimal eingeben um Tippfehler zu vermeiden!)</i></p>
+    <h2>eMail-Optionen</h2>
+    <p>Welche Informationen möchtest du per eMail statt per Post erhalten?<br>
+    <b>Die Informationen werden dann nicht mehr per Post versendet!</b></p>
+    <label for="email_newsletter">eMail-Verteiler:</label>
+    <input type="checkbox" class="formdata" name="email_newsletter" id="email_newsletter"><br>
+    <label for="email_protocols">Protokolle:</label>
+    <input type="checkbox" class="formdata" name="email_protocols" id="email_protocols"><br>
+    <label for="email_magazine">{{ magazine_name }}:</label>
+    <input type="checkbox" class="formdata" name="email_magazine" id="email_magazine"><br>
+    <h2>Datenschutz</h2>
+    <label for="allow_address_internal">Adresse sichtbar:</label>
+    <input type="checkbox" class="formdata" name="allow_address_internal" id="allow_address_internal"><br>
+    <p>Wenn du dies auswählst können andere Mitglieder deine Adresse und deine eMail-Adresse sehen.</p>
+    <hr>
+    <button id="submit" onclick="submit()">Änderungen speichern</button>
+    <p><i><b>Hinweis:</b> Änderungen werden hier direkt gespeichert, müssen aber bei manchen Optionen, z.B. beim Mailverteiler, vom Schriftwart manuell in andere Systeme übertragen werden. Bitte habe hier etwas Geduld!</i></p>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+<script>
+    var relroot = '{{ relroot }}';
+    var m = JSON.parse({{ mJson|tojson }})[0];
+    
+    function showMember(){
+        document.getElementById('mid').value = m.mid;
+        document.getElementById('name').innerHTML = m.title+' '+m.given_name+' '+m.family_name;
+        document.getElementById('street').value = m.street;
+        document.getElementById('street_number').value = m.street_number;
+        document.getElementById('appartment').value = m.appartment;
+        document.getElementById('postal_code').value = m.postal_code;
+        document.getElementById('city').value = m.city;
+        document.getElementById('email').value = m.email;
+        document.getElementById('email2').value = m.email;
+        document.getElementById('email_newsletter').checked = m.email_newsletter;
+        document.getElementById('email_protocols').checked = m.email_protocols;
+        document.getElementById('email_magazine').checked = m.email_magazine;
+    }
+    showMember();
+    
+    async function submit() {
+        // send form to server
+        var formJson = getFormJson();
+        if (formJson.email != formJson.email2){
+            pa.error('Die Mailadressen stimmen nicht überein!');
+            return;
+        }
+        var postUrl = relroot+'member/'+m.mid;
+        try{
+            const response = await fetch(postUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formJson)
+            });
+            response.text().then(function (text) {
+                pa.message(text)
+            });
+        } catch(err) {
+            alert(err);
+        }
+    }
+</script>
+
+{% endblock %}

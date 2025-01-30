@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p id="nav" class="no-print" style="width:100%; background-color:080; text-align:right;">
+    [optional page-nav]
+</p>
+<div id="content">
+    <h1>MemberBase admin</h1>
+    <p><a href="_logout">logout</a></p>
+    <h2>Admin-Einstellungen</h2>
+    <h3>System</h3>
+    <label for="dbfile">Datenbank-Datei:</label>
+    <input type="text" class="formdata" name="dbfile" id="dbfile"><br>
+    <label for="host">Host:</label>
+    <input type="text" class="formdata" name="host" id="host"><br>
+    <label for="port">Port:</label>
+    <input type="text" class="formdata" name="port" id="port"><br>
+    <label for="debug">Debug:</label>
+    <input type="text" class="formdata" name="debug" id="debug"><br>
+    <h3>Globale Variablen</h3>
+    <label for="organame">Vereinsname:</label>
+    <input type="text" class="formdata" name="organame" id="organame"><br>
+    <label for="magazine_name">Mitglieder-Zeitung:</label>
+    <input type="text" class="formdata" name="magazine_name" id="magazine_name"><br>
+    <button id="submit" onclick="submit()">Änderungen speichern</button>
+    <hr>
+    <p><a href="{{ relroot }}manage">Management</a></p>
+    <p><a href="{{ relroot }}_csvImport">csvImport</a></p>
+    <hr>
+    <h2>Alle Mitglieder</h2>
+    <div id="memberlist"></div>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+
+<script>
+    var relroot = '{{ relroot }}';
+    var settings = JSON.parse({{ sJson|tojson }});
+    document.getElementById('dbfile').value = settings.dbfile;
+    document.getElementById('host').value = settings.host;
+    document.getElementById('port').value = settings.port;
+    document.getElementById('debug').value = settings.debug;
+    document.getElementById('organame').value = settings.organame;
+    document.getElementById('magazine_name').value = settings.magazine_name;
+    var members = JSON.parse({{ msJson|tojson }});
+    var out = '<table>';
+    out += '<tr><th>Nachname</th><th>Vorname</th><th>Geburtsdatum</th></tr>\n';
+    for (var i=0; i<members.length; i++){
+        out += '<tr>';
+        out += '<td><a href="{{ relroot }}member/'+members[i].mid+'">'+members[i].family_name+'</a></td>';
+        out += '<td>'+members[i].given_name+'</td>';
+        out += '<td>'+members[i].date_of_birth+'</td>';
+        out += '</tr>';
+    }
+    out += '</table>';
+    document.getElementById('memberlist').innerHTML = out;
+    
+    async function submit() {
+        // send form to server
+        var formJson = getFormJson();
+        var postUrl = relroot+'_adminSaveSettings';
+        try{
+            const response = await fetch(postUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formJson)
+            });
+            response.text().then(function (text) {
+                pa.message(text)
+            });
+        } catch(err) {
+            alert(err);
+        }
+    }
+</script>
+{% endblock %}

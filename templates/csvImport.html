@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block style %}
+{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1>CSV-Import</h1>
+    <p>Die Titelzeile <b>muss genau so</b> sein wie folgt:<br>
+         <i>(um sicher zu gehen, dass du weißt was du tust und um dich zum Nachdenken zu zwingen bevor du hier Schäden anrichtest!)</i><br>
+        <code><pre>family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,note_public,note_manager</pre></code>
+        Der <code>family_name</code> und der <code>given_name</code> <b>muss</b> vergeben sein, der Delimiter ist <code>,</code>, der Quodechar <code>"</code>, das Encoding ist <code>utf-8</code>.
+    </p>
+    <input type="file" id="file" name="file" /><br />
+    <p style="color: red;">WARNUNG/TODO: Aktuell werden alle Nutzer neu angelegt wo nicht Nachname, Vorname und Geburtsdatum EXAKT gleich sind!<br>
+    !!! NUR FÜR ERSTIMPORT ODER DEVELOPMENT BENUTZEN !!!</p>
+    <button onclick="uploadCsv()">Importieren</button>
+    <div id="changes">
+    </div>
+    <hr>
+    <h2>TODO:</h2>
+    <p>Vorgehen mit den Daten <i>Vorname</i>, <i>Nachname</i> und <i>Geburtsdatum</i>:</p>
+    <ul>
+        <li>Nutzer mit drei Übereinstimmungen werden automatisch aktualisiert</li>
+        <li>Nutzer mit zwei Übereinstimmungen werden als Fehler ausgegeben</li>
+        <li>Nutzer mit einer Übereinstimmung werden zum Löschen angeboten</li>
+        <li>Nutzer ohne Übereinstrimmung werden importiert</li>
+        <li>Alte Nutzer werden zum Löschen vorgeschlagen</li>
+    </ul>
+    <p>&nbsp;</p>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+<script>
+    var relroot = '{{ relroot }}';
+    function askSubmit() {
+        pa.boolean('Wirklich? Es gibt KEIN "Rückgängig"!')
+    }
+    function paOk(str) {
+        applyChanges();
+    }
+    var ch = {};
+    async function uploadCsv() {
+        // send file to server
+        document.getElementById('changes').innerHTML = '<p>Daten werden verarbeitet...</p>';
+        var formData = new FormData();
+        var file = document.getElementById('file').files[0];
+        formData.append('file', file);
+        var putUrl = relroot+'_csvImport';
+        try{
+            const response = await fetch(putUrl, {
+                method: 'POST',
+                body: formData
+            });
+            response.text().then(function (rtext) {
+                pa.message(rtext);
+            });
+        } catch(err) {
+            pa.error(err);
+        }
+        document.getElementById('changes').innerHTML = '';
+    }
+</script>
+{% endblock %}

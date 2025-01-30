@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+            <p id="nav" class="no-print" style="width:100%; background-color:080; text-align:right;">
+                <a href="{{ relroot }}">home</a>
+            </p>
+<nav id="pagenav">
+    <p>Logged in as: {{ authuser }} | <a href="{{ relroot }}_logout">Logout</a></p>
+</nav>
+<div id="content">
+    <h1>Mitglied verwalten</h1>
+    <p>TODO: Bearbeiten ermöglichen</p>
+    <div id="data"></div>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+<script>
+    var relroot = '{{ relroot }}';
+    var m = JSON.parse({{ mJson|tojson }})[0];
+    
+    function showMember(){
+        out = '<table><tr><th>key</th><th>value</th></tr>';
+        for (var key in m) {
+            out += '<tr><td>'+key+'</td>';
+            out += '<td>'+m[key]+'</td></tr>';
+        }
+        out += '</table>';
+        document.getElementById('data').innerHTML = out;
+    }
+    showMember();
+</script>
+
+{% endblock %}
