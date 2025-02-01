@@ -40,23 +40,31 @@ class User(flask_login.UserMixin):
 
 @login_manager.user_loader
 def user_loader(username):
-    if username != settings.get('admin'):
-        return
-    user = User()
-    user.id = username
-    return user
+    if username == settings.get('admin'):
+        user = User()
+        user.id = username
+        return user
+    db = dbio.MbDb(dbfile)
+    mid = db.getMidFromMail(username)
+    if mid != None:
+        user = User()
+        user.id = username
+    return
 
 @login_manager.request_loader
 def request_loader(request):
     username = request.form.get('username')
-    #if username not in users:
-    if username != settings.get('admin'):
-        return
+    password = request.form.get('password')
     user = User()
     user.id = username
+    db = dbio.MbDb(dbfile)
     if username == settings.get('admin'):
-        user.is_authenticated = settings.checkPw(request.form['password'])
-    return user
+        user.is_authenticated = settings.checkPw(password)
+    elif db.getMidFromMail('username') != None:
+        user.is_authenticated = db.checkPasswd(username, password)
+    if user.is_authenticated:
+        return user
+    return
 
 # routes
 
@@ -65,12 +73,14 @@ def index():
     '''show index-page'''
     if settings.get('admin') == '':
         return redirect('_init')
-    elif flask_login.current_user.is_anonymous:
+    elif flask_login.current_user.is_anonymous or flask_login.current_user.id==None:
         return render_template('index.html', relroot='./', organame=settings.get('organame'))
     elif flask_login.current_user.id == settings.get('admin'):
         return redirect('admin')
     else:
-        return redirect('_user/'+flask_login.current_user.id)
+        db = dbio.MbDb(dbfile)
+        mid = db.getMidFromMail(flask_login.current_user.id)
+        return redirect('member/'+mid)
 
 @MemberBase.route('/_init', methods=['GET', 'POST'])
 def init():
@@ -98,6 +108,14 @@ def login():
             user.id = username
             flask_login.login_user(user)
             return redirect('admin')
+    db = dbio.MbDb(dbfile)
+    mid = db.getMidFromMail(username)
+    if mid != None:
+        db = dbio.MbDb(dbfile)
+        user = User()
+        user.id = username
+        flask_login.login_user(user)
+        return redirect('member/'+db.getMidFromMail(username))
     return 'Bad login'
 
 @MemberBase.route('/_logout')
@@ -173,8 +191,12 @@ def member(mid):
         return '404'
     db = dbio.MbDb(dbfile)
     member = db.getMember(mid)
-    if flask_login.current_user.is_anonymous:
-        user = '[private URL]'
+    if flask_login.current_user.is_anonymous or flask_login.current_user.id == None:
+        if db.checkPasswdSet(mid):
+            print(db.checkPasswdSet(mid))
+            return '405 not allowed'
+        else:
+            user = '[private URL]'
     else:
         user = flask_login.current_user.id
     mJson = json.dumps(member)
@@ -232,9 +254,8 @@ def csvImportPost():
 def delete(wid):
     # TODO
     '''delete data'''
-    db = dbio.PwDb(dbfile)
-    db.deleteWord(did)
-    return 'ok'
+    #db = dbio.PwDb(dbfile)
+    return 'TODO'
 
 # run it:
 

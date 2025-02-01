@@ -40,6 +40,21 @@
     <label for="allow_address_internal">Adresse sichtbar:</label>
     <input type="checkbox" class="formdata" name="allow_address_internal" id="allow_address_internal"><br>
     <p>Wenn du dies auswählst können andere Mitglieder deine Adresse und deine eMail-Adresse sehen.</p>
+    <h3>Passwort einrichten</h3>
+    <p>Diese Seite ist durch die URL geschützt.<br>
+        Optional kannst du auch ein Passwort festlegen, dann ist diese Seite ohne Passwort nicht mehr erreichbar.<br>
+        <i>(Hinweis: Das Zurücksetzen eines vergessenen Passwortes ist aktuell nur durch den Vorstand möglich!)</i></p>
+    <label for="password">Passwort:</label>
+    <input type="password" class="formdata" name="password" id="password" oninput="pwType(this.value)"><br>
+    <label for="password2">Passwort-Verifikation:</label>
+    <input type="password" class="formdata" name="password2" id="password2"><br>
+    <p>Das Passwort muss:
+        <ul>
+            <li><b>mindestens <u>10 Zeichen</u></b> lang sein</li>
+            <li><b>mindestens einen <u>Großbuchstaben</u>, einen <u>Kleinbuchstaben</u> und eine <u>Ziffer</u></b> enthalten</li>
+            <li>erlaubte Sonderzeichen (nicht empfohlen!): <code>äöüÄÖÜß!§$%()=?+-_</code>
+        </ul>
+    </p>
     <hr>
     <button id="submit" onclick="submit()">Änderungen speichern</button>
     <p><i><b>Hinweis:</b> Änderungen werden hier direkt gespeichert, müssen aber bei manchen Optionen, z.B. beim Mailverteiler, vom Schriftwart manuell in andere Systeme übertragen werden. Bitte habe hier etwas Geduld!</i></p>
@@ -74,6 +89,15 @@
             pa.error('Die Mailadressen stimmen nicht überein!');
             return;
         }
+        if (formJson.password != formJson.password2){
+            pa.error('Die Passwörter stimmen nicht überein!');
+            return;
+        }
+        var pwInput = document.getElementById('password');
+        if (pwInput.style.color != 'green'){
+            pa.error('Das Passwort entspricht noch nicht den Anforderungen!');
+            return;
+        }
         var postUrl = relroot+'member/'+m.mid;
         try{
             const response = await fetch(postUrl, {
@@ -84,10 +108,27 @@
                 body: JSON.stringify(formJson)
             });
             response.text().then(function (text) {
-                pa.message(text)
+                if (text='ok') pa.message('Erfolgreich gespeichert!');
+                else pa.warning(text);
             });
         } catch(err) {
             alert(err);
+        }
+    }
+    
+    var pwRegex = new RegExp("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=^[a-zA-Z0-9äöüÄÖÜß!§$%()=?+-_]{10,}$)");
+    function pwType(val) {
+        var pwInput = document.getElementById('password');
+        pwInput.style.color = 'orange';
+        if (val.length < 10) {
+            pwInput.style.color = 'red';
+        } else {
+            if (pwRegex.test(val)) {
+                pwInput.style.color = 'green';
+            }
+            else {
+                pwInput.style.color = 'orange';
+            }
         }
     }
 </script>

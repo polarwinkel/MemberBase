@@ -131,10 +131,26 @@ class MbDb:
         cursor.execute(sqlTemplate, (m['street'], m['street_number'], 
                 m['appartment'], m['postal_code'], m['city'], 
                 m['email_newsletter'], m['email_protocols'], m['email_magazine'], m['mid']))
+        if len(m['password'])>=10:
+            salt = uuid.uuid4().hex
+            hashed_password = hashlib.sha512(m['password'].encode('utf-8') + salt.encode('utf-8')).hexdigest()
+            sqlTemplate = '''UPDATE members SET pwsalt=?, pwhash=? WHERE mid=?'''
+            cursor.execute(sqlTemplate, (salt, hashed_password, m['mid']))
         # TODO: add log entry
         self._connection.commit()
         return('ok')
-
+    
+    def getMidFromMail(self, email):
+        '''returns a mid to an eMail-address'''
+        cursor = self._connection.cursor()
+        sqlTemplate = '''SELECT mid FROM members WHERE email=?'''
+        cursor.execute(sqlTemplate, (email, ))
+        result = cursor.fetchone()
+        self._connection.commit()
+        if result != None:
+            return result[0]
+        return None
+    
     
     def getRole(self, mid):
         '''returns a list of all roles a member has'''
@@ -172,11 +188,22 @@ class MbDb:
                 })
         return result
     
+    def checkPasswdSet(self, mid):
+        '''checks if a password is set for a user (short-mid allowed)'''
+        cursor = self._connection.cursor()
+        sqlTemplate = '''SELECT pwhash FROM members WHERE mid LIKE ?'''
+        cursor.execute(sqlTemplate, (mid+'%', ))
+        u = cursor.fetchone()
+        self._connection.commit()
+        if u[0] == None:
+            return False
+        return True
+        
     def checkPasswd(self, email, passwd):
         '''checks a password for a email'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT pwhash, salt FROM users WHERE email=?'''
-        cursor.execute(sqlTemplate, (uname, ))
+        sqlTemplate = '''SELECT pwhash, pwsalt FROM members WHERE email=?'''
+        cursor.execute(sqlTemplate, (email, ))
         u = cursor.fetchone()
         self._connection.commit()
         if u == None:
