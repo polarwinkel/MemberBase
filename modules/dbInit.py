@@ -11,7 +11,7 @@ def checkTables(db):
     cursor = db._connection.cursor()
     sql_command = '''
         CREATE TABLE IF NOT EXISTS members (
-            mid VARCHAR(32) NOT NULL PRIMARY KEY,
+            mid VARCHAR(64) NOT NULL PRIMARY KEY,
             family_name VARCHAR(64) NOT NULL,
             given_name VARCHAR(64) NOT NULL,
             date_of_birth DATE NOT NULL,
@@ -56,28 +56,35 @@ def checkTables(db):
         raise
     
     sql_command = '''
-        CREATE TABLE IF NOT EXISTS roles (
-            rid INTEGER NOT NULL PRIMARY KEY,
-            role_name VARCHAR(64)
+        CREATE TABLE IF NOT EXISTS groups (
+            gid VARCHAR(64) NOT NULL PRIMARY KEY,
+            group_name VARCHAR(64) UNIQUE
         );'''
     try:
         cursor.execute(sql_command)
     except sqlite3.OperationalError as err:
         args = list(err.args)
-        args.append('Failed to create roles table')
+        args.append('Failed to create groups table')
         err.args = tuple(args)
         raise
+    sql_command = '''SELECT gid FROM groups WHERE group_name='management' '''
+    cursor.execute(sql_command)
+    gid = cursor.fetchone()
+    if gid==None:
+        import uuid, huuid
+        sql_command = '''INSERT INTO groups (gid, group_name) VALUES (?,?) '''
+        cursor.execute(sql_command, (huuid.uuid2human(uuid.uuid4()), 'management'))
     
     sql_command = '''
-        CREATE TABLE IF NOT EXISTS role_members (
+        CREATE TABLE IF NOT EXISTS group_members (
             mid INTEGER NOT NULL,
-            rid INTEGER NOT NULL
+            gid INTEGER NOT NULL
         );'''
     try:
         cursor.execute(sql_command)
     except sqlite3.OperationalError as err:
         args = list(err.args)
-        args.append('Failed to create role_members table')
+        args.append('Failed to create group_members table')
         err.args = tuple(args)
         raise
     
@@ -92,7 +99,7 @@ def checkTables(db):
         cursor.execute(sql_command)
     except sqlite3.OperationalError as err:
         args = list(err.args)
-        args.append('Failed to create role_members table')
+        args.append('Failed to create group_members table')
         err.args = tuple(args)
         raise
     

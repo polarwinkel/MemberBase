@@ -146,7 +146,9 @@ def admin():
             'debug':settings.get('debug'), 'organame':settings.get('organame'), 'magazine_name':settings.get('magazine_name')});
     members = db.getMembers()
     msJson = json.dumps(members, indent=2)
-    return render_template('admin.html', relroot='./', authuser=flask_login.current_user.id, sJson=sJson, msJson=msJson)
+    groups = db.getGroups()
+    gJson = json.dumps(groups, indent=2)
+    return render_template('admin.html', relroot='./', authuser=flask_login.current_user.id, sJson=sJson, msJson=msJson, gJson=gJson)
 
 @MemberBase.route('/_adminSaveSettings', methods=['PUT'])
 @flask_login.login_required
@@ -191,16 +193,22 @@ def member(mid):
         return '404'
     db = dbio.MbDb(dbfile)
     member = db.getMember(mid)
+    if member == None:
+        return 404
     if flask_login.current_user.is_anonymous or flask_login.current_user.id == None:
         if db.checkPasswdSet(mid):
-            print(db.checkPasswdSet(mid))
             return '405 not allowed'
         else:
             user = '[private URL]'
     else:
         user = flask_login.current_user.id
     mJson = json.dumps(member)
-    return render_template('member.html', relroot='../', authuser=user, mJson=mJson, magazine_name=settings.get('magazine_name'))
+    if flask_login.current_user.id == settings.get('admin'):
+        groups = ['management']
+    else:
+        groups = db.getGroups(mid)
+    gJson = json.dumps(groups)
+    return render_template('member.html', relroot='../', authuser=user, mJson=mJson, gJson=gJson, magazine_name=settings.get('magazine_name'))
 
 @MemberBase.route('/member', methods=['POST'])
 def memberNew():
@@ -248,6 +256,18 @@ def csvImportPost():
         linecount += 1
     #db.addData(flask_login.current_user.id, d['text'])
     return 'TODO ('+str(linecount)+' Zeilen gelesen, '+str(importcount)+' importiert)'
+
+@MemberBase.route('/group/<gid>', methods=['GET'])
+@flask_login.login_required
+def group(gid):
+    '''show group'''
+    user = flask_login.current_user.id
+    if flask_login.current_user.id != settings.get('admin'):
+        return '405 not allowed'
+    db = dbio.MbDb(dbfile)
+    gmembers = db.getMembers(gid)
+    gmJson = json.dumps(gmembers, indent=2)
+    return render_template('group.html', relroot='../', authuser=flask_login.current_user.id, gmJson=gmJson, gid=gid)
 
 @MemberBase.route('/_delete/<did>', methods=['DELETE'])
 @flask_login.login_required

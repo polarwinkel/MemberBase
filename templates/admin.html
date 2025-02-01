@@ -27,6 +27,9 @@
     <p><a href="{{ relroot }}manage">Management</a></p>
     <p><a href="{{ relroot }}_csvImport">csvImport</a></p>
     <hr>
+    <h2>Alle Gruppen</h2>
+    <div id="grouplist"></div>
+    <hr>
     <h2>Alle Mitglieder</h2>
     <div id="memberlist"></div>
 </div>
@@ -43,6 +46,19 @@
     document.getElementById('debug').value = settings.debug;
     document.getElementById('organame').value = settings.organame;
     document.getElementById('magazine_name').value = settings.magazine_name;
+    
+    var groups = JSON.parse({{ gJson|tojson }});
+    var out = '<table>';
+    out += '<tr><th>gid</th><th>group_name</th></tr>\n';
+    for (var i=0; i<groups.length; i++){
+        out += '<tr>';
+        out += '<td><a href="{{ relroot }}group/'+groups[i].gid+'">'+groups[i].gid+'</a></td>';
+        out += '<td>'+groups[i].group_name+'</td>';
+        out += '</tr>';
+    }
+    out += '</table>';
+    document.getElementById('grouplist').innerHTML = out;
+    
     var members = JSON.parse({{ msJson|tojson }});
     var out = '<table>';
     out += '<tr><th>Nachname</th><th>Vorname</th><th>Geburtsdatum</th></tr>\n';

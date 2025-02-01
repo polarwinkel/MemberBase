@@ -151,12 +151,16 @@ class MbDb:
             return result[0]
         return None
     
-    
-    def getRole(self, mid):
-        '''returns a list of all roles a member has'''
+    def getGroups(self, mid=''):
+        '''returns a list of all groups a member has'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT rid, role_name FROM role JOIN role_members WHERE mid=?'''
-        cursor.execute(sqlTemplate, )
+        if mid=='':
+            sqlTemplate = '''SELECT gid, group_name FROM groups'''
+            cursor.execute(sqlTemplate, )
+        else:
+            sqlTemplate = '''SELECT groups.gid, groups.group_name FROM groups JOIN group_members
+                    ON groups.gid = group_members.gid WHERE group_members.mid=?'''
+            cursor.execute(sqlTemplate, (mid, ))
         tup = cursor.fetchall()
         self._connection.commit()
         if tup is None:
@@ -164,16 +168,22 @@ class MbDb:
         result = []
         for t in tup:
             result.append({
-                    'rid'       : t[0],
-                    'role_name' : t[1]
+                    'gid'           : t[0],
+                    'group_name'    : t[1]
                 })
         return result
     
-    def getMembers(self, role=''):
-        '''returns a list of all members TODO: with a certain role'''
+    def getMembers(self, gid=''):
+        '''returns a list of all members [with a certain group]'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT mid, family_name, given_name, date_of_birth FROM members'''
-        cursor.execute(sqlTemplate, )
+        if gid=='':
+            sqlTemplate = '''SELECT mid, family_name, given_name, date_of_birth FROM members'''
+            cursor.execute(sqlTemplate, )
+        else:
+            sqlTemplate = '''SELECT members.mid, members.family_name, members.given_name, members.date_of_birth 
+                    FROM members JOIN group_members ON members.mid=group_members.mid
+                    WHERE gid=?'''
+            cursor.execute(sqlTemplate, (gid, ))
         tup = cursor.fetchall()
         self._connection.commit()
         if tup is None:

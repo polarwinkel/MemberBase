@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p id="nav" class="no-print" style="width:100%; background-color:080; text-align:right;">
+    [optional page-nav]
+</p>
+<div id="content">
+    <h1>MemberBase group-management "{{ gid }}"</h1>
+    <p><a href="_logout">logout</a></p>
+    <h2>Alle Mitglieder</h2>
+    <div id="gmlist"></div>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+
+<script>
+    var relroot = '{{ relroot }}';
+    var gm = JSON.parse({{ gmJson|tojson }});
+    var out = '<table>';
+    out += '<tr><th>family_name</th><th>given_name</th></tr>\n';
+    for (var i=0; i<gm.length; i++){
+        out += '<tr>';
+        out += '<td><a href="{{ relroot }}group/'+gm[i].mid+'">'+gm[i].family_name+'</a></td>';
+        out += '<td>'+gm[i].given_name+'</td>';
+        out += '</tr>';
+    }
+    out += '</table>';
+    document.getElementById('gmlist').innerHTML = out;
+    
+    async function submit() {
+        // send form to server
+        var formJson = getFormJson();
+        var postUrl = relroot+'_addToGroup';
+        try{
+            const response = await fetch(postUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formJson)
+            });
+            response.text().then(function (text) {
+                pa.message(text)
+            });
+        } catch(err) {
+            alert(err);
+        }
+    }
+</script>
+{% endblock %}

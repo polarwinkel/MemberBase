@@ -5,7 +5,6 @@
                 <a href="{{ relroot }}">home</a>
             </p>
 <nav id="pagenav">
-    <p>Logged in as: {{ authuser }} | <a href="{{ relroot }}_logout">Logout</a></p>
 </nav>
 <div id="content">
     <input type="hidden" class="formdata" name="mid" id="mid"><br>
@@ -65,6 +64,17 @@
 <script>
     var relroot = '{{ relroot }}';
     var m = JSON.parse({{ mJson|tojson }})[0];
+    var g = JSON.parse({{ gJson|tojson }});
+    console.log(g);
+    
+    var pagenav = document.getElementById('pagenav');
+    if (g==[]) {
+        pagenav.innerHTML = '<p>Logged in as: {{ authuser }} | <a href="{{ relroot }}_logout">Logout</a></p>';
+    } else if (g.includes('management')) {
+        pagenav.innerHTML = '<p>Logged in as: {{ authuser }} | <a href="{{ relroot }}_logout">Logout</a> | <a href="{{ relroot }}manage">Manage</a></p>';
+    } else {
+        pagenav.innerHTML = '<p>Logged in as: {{ authuser }} | <a href="{{ relroot }}_logout">Logout</a></p>';
+    }
     
     function showMember(){
         document.getElementById('mid').value = m.mid;
