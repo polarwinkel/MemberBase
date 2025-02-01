@@ -71,9 +71,9 @@ def checkTables(db):
     cursor.execute(sql_command)
     gid = cursor.fetchone()
     if gid==None:
-        import uuid, huuid
+        import huuid
         sql_command = '''INSERT INTO groups (gid, group_name) VALUES (?,?) '''
-        cursor.execute(sql_command, (huuid.uuid2human(uuid.uuid4()), 'management'))
+        cursor.execute(sql_command, (huuid.new(), 'management'))
     
     sql_command = '''
         CREATE TABLE IF NOT EXISTS group_members (

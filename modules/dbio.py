@@ -43,7 +43,7 @@ class MbDb:
         '''adds a new member, returning its mid (or False if exists)'''
         if self.checkMember(family_name, given_name, date_of_birth) is not None:
             return False
-        mid = huuid.uuid2human(str(uuid.uuid4()))
+        mid = huuid.new()
         # TODO: check if one with first 32bit exists already
         cursor = self._connection.cursor()
         sqlTemplate = '''INSERT INTO members (mid,family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,note_public,note_manager)
