@@ -2,13 +2,19 @@
 
 {% block content %}
 <p id="nav" class="no-print" style="width:100%; background-color:080; text-align:right;">
-    [optional page-nav]
+    &nbsp;
 </p>
 <div id="content">
-    <h1>MemberBase group-management "{{ gid }}"</h1>
-    <p><a href="_logout">logout</a></p>
+    <h1>Gruppe "{{ gname }}"</h1>
+    <p><a href="{{ relroot }}_logout">logout</a></p>
     <h2>Alle Mitglieder</h2>
     <div id="gmlist"></div>
+    <input type="hidden" class="formdata" name="gid" id="gid" value="{{ gid }}">
+    <label for="addMember">Mitglied hinzufügen:</label>
+    <select class="formdata" name="addMember" id="addMember">
+        <option value="">-</option>
+    </select>
+    <input type="submit" onclick="submit()">
 </div>
 
 <script src="{{ relroot }}_static/getFormJson.js"></script>
@@ -17,6 +23,7 @@
 <script>
     var relroot = '{{ relroot }}';
     var gm = JSON.parse({{ gmJson|tojson }});
+    var gnm = JSON.parse({{ gnmJson|tojson }});
     var out = '<table>';
     out += '<tr><th>family_name</th><th>given_name</th></tr>\n';
     for (var i=0; i<gm.length; i++){
@@ -28,10 +35,18 @@
     out += '</table>';
     document.getElementById('gmlist').innerHTML = out;
     
+    var addMember = document.getElementById('addMember');
+    for (var i = 0; i<gnm.length; i++){
+        var opt = document.createElement('option');
+        opt.value = gnm[i].mid;
+        opt.innerHTML = gnm[i].given_name+' '+gnm[i].family_name;
+        addMember.appendChild(opt);
+    }
+    
     async function submit() {
         // send form to server
         var formJson = getFormJson();
-        var postUrl = relroot+'_addToGroup';
+        var postUrl = 'addMember';
         try{
             const response = await fetch(postUrl, {
                 method: 'PUT',

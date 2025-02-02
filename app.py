@@ -49,6 +49,7 @@ def user_loader(username):
     if mid != None:
         user = User()
         user.id = username
+        return user
     return
 
 @login_manager.request_loader
@@ -167,9 +168,9 @@ def adminSaveSettings():
 def manage():
     '''show manager-page'''
     user = flask_login.current_user.id
-    if flask_login.current_user.id != settings.get('admin'):
-        return '405 not allowed'
     db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return '405 not allowed'
     members = db.getMembers()
     msJson = json.dumps(members, indent=2)
     return render_template('manage.html', relroot='./', authuser=flask_login.current_user.id, msJson=msJson)
@@ -179,9 +180,9 @@ def manage():
 def manageMember(mid):
     '''show member-management-page'''
     user = flask_login.current_user.id
-    if flask_login.current_user.id != settings.get('admin'):# TODO: allow for management-users
-        return '405 not allowed'
     db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return '405 not allowed'
     member = db.getMember(mid)
     mJson = json.dumps(member, indent=2)
     return render_template('manageMember.html', relroot='../', authuser=flask_login.current_user.id, mJson=mJson)
@@ -208,7 +209,9 @@ def member(mid):
     else:
         groups = db.getGroups(mid)
     gJson = json.dumps(groups)
-    return render_template('member.html', relroot='../', authuser=user, mJson=mJson, gJson=gJson, magazine_name=settings.get('magazine_name'))
+    manager = db.checkManager(user)
+    return render_template('member.html', relroot='../', authuser=user, manager=manager, 
+            mJson=mJson, gJson=gJson, magazine_name=settings.get('magazine_name'))
 
 @MemberBase.route('/member', methods=['POST'])
 def memberNew():
@@ -262,12 +265,27 @@ def csvImportPost():
 def group(gid):
     '''show group'''
     user = flask_login.current_user.id
-    if flask_login.current_user.id != settings.get('admin'):
-        return '405 not allowed'
     db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return '405 not allowed'
+    gname = db.getGroupName(gid)
     gmembers = db.getMembers(gid)
+    gNmembers = db.getNotMembers(gid)
     gmJson = json.dumps(gmembers, indent=2)
-    return render_template('group.html', relroot='../', authuser=flask_login.current_user.id, gmJson=gmJson, gid=gid)
+    gnmJson = json.dumps(gNmembers, indent=2)
+    return render_template('group.html', relroot='../', authuser=flask_login.current_user.id, gmJson=gmJson, gnmJson=gnmJson, gname=gname, gid=gid)
+
+@MemberBase.route('/group/addMember', methods=['PUT'])
+@flask_login.login_required
+def groupAddMember():
+    '''show group'''
+    user = flask_login.current_user.id
+    db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return '405 not allowed'
+    job = request.json
+    db.addGroupMember(job['gid'], job['addMember'])
+    return 'ok'
 
 @MemberBase.route('/_delete/<did>', methods=['DELETE'])
 @flask_login.login_required

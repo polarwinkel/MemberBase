@@ -141,7 +141,7 @@ class MbDb:
         return('ok')
     
     def getMidFromMail(self, email):
-        '''returns a mid to an eMail-address'''
+        '''returns a member-id to an eMail-address'''
         cursor = self._connection.cursor()
         sqlTemplate = '''SELECT mid FROM members WHERE email=?'''
         cursor.execute(sqlTemplate, (email, ))
@@ -151,8 +151,19 @@ class MbDb:
             return result[0]
         return None
     
+    def getGroupName(self, gid):
+        '''returns the name of a group'''
+        cursor = self._connection.cursor()
+        sqlTemplate = '''SELECT group_name FROM groups WHERE gid=?'''
+        cursor.execute(sqlTemplate, (gid, ))
+        res = cursor.fetchone()
+        self._connection.commit()
+        if res is None:
+            return None
+        return res[0]
+    
     def getGroups(self, mid=''):
-        '''returns a list of all groups a member has'''
+        '''returns a list of all groups [of a member]'''
         cursor = self._connection.cursor()
         if mid=='':
             sqlTemplate = '''SELECT gid, group_name FROM groups'''
@@ -198,6 +209,51 @@ class MbDb:
                 })
         return result
     
+    def getNotMembers(self, gid):
+        '''returns a list of all non-members of a group'''
+        cursor = self._connection.cursor()
+        sqlTemplate = '''SELECT mid, family_name, given_name, date_of_birth
+                FROM members WHERE mid NOT IN
+                (SELECT mid FROM group_members WHERE gid=?)
+                ORDER BY family_name, given_name'''
+        cursor.execute(sqlTemplate, (gid, ))
+        tup = cursor.fetchall()
+        self._connection.commit()
+        if tup is None:
+            return None
+        result = []
+        for t in tup:
+            result.append({
+                    'mid'           : t[0],
+                    'family_name'   : t[1],
+                    'given_name'    : t[2],
+                    'date_of_birth' : t[3]
+                })
+        return result
+    
+    def addGroupMember(self, gid, mid):
+        '''adds a member to a group'''
+        cursor = self._connection.cursor()
+        sqlTemplate = '''INSERT INTO group_members (gid, mid)
+                VALUES (?, ?)'''
+        cursor.execute(sqlTemplate, (gid, mid))
+        self._connection.commit()
+        return 'ok'
+    
+    def checkManager(self, user):
+        '''check if a user-id (eMail) is member of group manager'''
+        mid = self.getMidFromMail(user)
+        cursor = self._connection.cursor()
+        sqlTemplate = '''SELECT group_members.mid FROM group_members JOIN groups 
+                ON group_members.gid=groups.gid 
+                WHERE groups.group_name='management' and group_members.mid=?'''
+        cursor.execute(sqlTemplate, (mid, ))
+        res = cursor.fetchone()
+        print(res)
+        if res == None:
+            return False
+        return True
+    
     def checkPasswdSet(self, mid):
         '''checks if a password is set for a user (short-mid allowed)'''
         cursor = self._connection.cursor()
@@ -210,7 +266,7 @@ class MbDb:
         return True
         
     def checkPasswd(self, email, passwd):
-        '''checks a password for a email'''
+        '''checks a password for an email'''
         cursor = self._connection.cursor()
         sqlTemplate = '''SELECT pwhash, pwsalt FROM members WHERE email=?'''
         cursor.execute(sqlTemplate, (email, ))
@@ -222,8 +278,11 @@ class MbDb:
         return u[0] == hashed
         
     def deleteMember(self, mid):
+        '''delete a member'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''DELETE FROM data WHERE did=?;'''
-        cursor.execute(sqlTemplate, (did))
+        sqlTemplate = '''DELETE FROM group_members WHERE mid=?;'''
+        cursor.execute(sqlTemplate, (mid))
+        sqlTemplate = '''DELETE FROM members WHERE mid=?;'''
+        cursor.execute(sqlTemplate, (mid))
         self._connection.commit()
     
