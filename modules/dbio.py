@@ -108,7 +108,7 @@ class MbDb:
                 })
         return result
     
-    def updateMember(self, user, m):
+    def updateMember(self, user, ip, m):
         # TODO: update all options
         '''update a member'''
         if m['email_newsletter']=='on':
@@ -124,6 +124,16 @@ class MbDb:
         else:
             m['email_magazine']=0
         cursor = self._connection.cursor()
+        # log:
+        sqlTemplate = '''SELECT * FROM members WHERE mid=?'''
+        cursor.execute(sqlTemplate, (m['mid'], ))
+        # TODO: log only changes; set 'address' to True if address changed
+        sqlTemplate = '''INSERT INTO log 
+                (timestamp,changed_mid,user_mid,remote_ip,old_data,new_data)
+                VALUES (CURRENT_TIMESTAMP,?,?,?,?,?)'''
+        mOld = cursor.fetchone()
+        cursor.execute(sqlTemplate, (m['mid'],self.getMidFromMail(user),ip,str(mOld),str(m)))
+        # update:
         sqlTemplate = '''UPDATE members SET street=?, street_number=?, 
                 appartment=?, postal_code=?, city=?, 
                 email_newsletter=?, email_protocols=?, email_magazine=?
@@ -249,7 +259,6 @@ class MbDb:
                 WHERE groups.group_name='management' and group_members.mid=?'''
         cursor.execute(sqlTemplate, (mid, ))
         res = cursor.fetchone()
-        print(res)
         if res == None:
             return False
         return True
@@ -276,7 +285,16 @@ class MbDb:
             return False
         hashed = hashlib.sha512(passwd.encode('utf-8') + u[1].encode('utf-8')).hexdigest()
         return u[0] == hashed
-        
+    
+    def getLog(self):
+        '''get the last 1000 log-entries'''
+        cursor = self._connection.cursor()
+        sqlTemplate = '''SELECT * FROM log'''
+        cursor.execute(sqlTemplate, )
+        res = cursor.fetchall()
+        self._connection.commit()
+        return res
+    
     def deleteMember(self, mid):
         '''delete a member'''
         cursor = self._connection.cursor()

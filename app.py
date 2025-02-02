@@ -224,7 +224,7 @@ def memberUpdate(mid):
     '''update a member'''
     m = request.json
     db = dbio.MbDb(dbfile)
-    result = db.updateMember(flask_login.current_user.id, m)
+    result = db.updateMember(flask_login.current_user.id, request.remote_addr, m)
     return result
 
 @MemberBase.route('/_csvImport', methods=['GET'])
@@ -286,6 +286,18 @@ def groupAddMember():
     job = request.json
     db.addGroupMember(job['gid'], job['addMember'])
     return 'ok'
+
+@MemberBase.route('/log', methods=['GET'])
+@flask_login.login_required
+def log():
+    '''show log'''
+    user = flask_login.current_user.id
+    db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return '405 not allowed'
+    log = db.getLog()
+    logJson = json.dumps(log, indent=2)
+    return render_template('log.html', relroot='./', authuser=flask_login.current_user.id, logJson=logJson)
 
 @MemberBase.route('/_delete/<did>', methods=['DELETE'])
 @flask_login.login_required

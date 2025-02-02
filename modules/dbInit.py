@@ -90,10 +90,13 @@ def checkTables(db):
     
     sql_command = '''
         CREATE TABLE IF NOT EXISTS log (
+            timestamp DATE NOT NULL,
             changed_mid INTEGER NOT NULL,
             user_mid VARCHAR(64),
+            remote_ip VARCHAR(64),
             address BOOLEAN,
-            logentry TEXT
+            old_data TEXT,
+            new_data TEXT
         );'''
     try:
         cursor.execute(sql_command)

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p id="nav" class="no-print" style="width:100%; background-color:080; text-align:right;">
+    &nbsp;
+</p>
+<div id="content">
+    <p><a href="{{ relroot }}_logout">logout</a></p>
+    <h1>Log</h1>
+    <div id="log">
+    </div>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+
+<script>
+    var relroot = '{{ relroot }}';
+    var lg = JSON.parse({{ logJson|tojson }});
+    console.log(lg);
+    out = '<table>';
+    out += '<tr><th>timestamp</th><th>changed_mid</th><th>user_mid</th><th>remote_ip</th>address<th></th><th>old_data</th><th>new_data</th></tr>\n';
+    for (var i=0; i<lg.length; i++){
+        out += '<tr>';
+        out += '<td>'+lg[i][0]+'</td>';
+        out += '<td>'+lg[i][1]+'</td>';
+        out += '<td>'+lg[i][2]+'</td>';
+        out += '<td>'+lg[i][3]+'</td>';
+        out += '<td>'+lg[i][4]+'</td>';
+        out += '<td>'+lg[i][5]+'</td>';
+        out += '<td>'+lg[i][6]+'</td>';
+        out += '</tr>';
+    }
+    out += '</table>';
+    document.getElementById('log').innerHTML = out;
+</script>
+{% endblock %}
