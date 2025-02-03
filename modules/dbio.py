@@ -124,6 +124,10 @@ class MbDb:
             m['email_magazine']=1
         else:
             m['email_magazine']=0
+        if m['allow_address_internal']=='on':
+            m['allow_address_internal']=1
+        else:
+            m['allow_address_internal']=0
         cursor = self._connection.cursor()
         # log:
         sqlTemplate = '''SELECT * FROM members WHERE mid=?'''
@@ -137,11 +141,13 @@ class MbDb:
         # update:
         sqlTemplate = '''UPDATE members SET street=?, street_number=?, 
                 appartment=?, postal_code=?, city=?, 
-                email_newsletter=?, email_protocols=?, email_magazine=?
+                email_newsletter=?, email_protocols=?, email_magazine=?, 
+                allow_address_internal=?
                 WHERE mid=?'''
         cursor.execute(sqlTemplate, (m['street'], m['street_number'], 
                 m['appartment'], m['postal_code'], m['city'], 
-                m['email_newsletter'], m['email_protocols'], m['email_magazine'], m['mid']))
+                m['email_newsletter'], m['email_protocols'], m['email_magazine'], 
+                m['allow_address_internal'], m['mid']))
         if len(m['password'])>=10:
             salt = uuid.uuid4().hex
             hashed_password = hashlib.sha512(m['password'].encode('utf-8') + salt.encode('utf-8')).hexdigest()
