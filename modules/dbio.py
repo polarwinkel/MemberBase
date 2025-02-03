@@ -8,6 +8,7 @@ import os
 from modules import dbInit
 from datetime import datetime
 import hashlib, uuid
+import io
 import huuid
 
 class MbDb:
@@ -274,6 +275,56 @@ class MbDb:
             return False
         return True
         
+    def csvExportMail(self, sel):
+        '''export member-list according to the selection'''
+        cursor = self._connection.cursor()
+        if sel == 'n':
+            where = 'WHERE email_newsletter=1'
+        if sel == 'p':
+            where = 'WHERE email_protocols=1'
+        elif sel == 'm':
+            where = 'WHERE email_magazine=1'
+        sqlTemplate = '''SELECT family_name, given_name, title, sex, email
+                FROM members {where} ORDER BY
+                REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+                family_name,'ä','ae'),'ö','oe'),'ü','ue'),'Ä','Ae'),'Ö','Oe'),'Ü','Ue'),'ß','ss'), 
+                REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+                given_name,'ä','ae'),'ö','oe'),'ü','ue'),'Ä','Ae'),'Ö','Oe'),'Ü','Ue'),'ß','ss') '''.format(where=where)
+        cursor.execute(sqlTemplate)
+        mlist = cursor.fetchall()
+        f = io.StringIO() # init-value would leave the cursor at beginning
+        f.write('family_name,given_name,title,sex,email,\n')
+        for m in mlist:
+            cstr = m[0]+','+m[1]+','+m[2]+','+m[3]+','+m[4]+',\n'
+            f.write(cstr)
+        f.seek(0) # get cursor to beginning
+        return f
+    
+    def csvExportAddr(self, sel):
+        '''export member-list according to the selection'''
+        cursor = self._connection.cursor()
+        if sel == 'p':
+            where = 'WHERE email_protocols=0 OR email_protocols IS NULL'
+        elif sel == 'm':
+            where = 'WHERE email_magazine=0 OR email_magazine IS NULL'
+        elif sel == 'pm':
+            where = 'WHERE email_protocols=0 OR email_protocols IS NULL OR email_magazine=0 OR email_magazine IS NULL'
+        sqlTemplate = '''SELECT family_name, given_name, title, sex, street, street_number, appartment, postal_code, city, country
+                FROM members {where} ORDER BY
+                REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+                family_name,'ä','ae'),'ö','oe'),'ü','ue'),'Ä','Ae'),'Ö','Oe'),'Ü','Ue'),'ß','ss'), 
+                REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+                given_name,'ä','ae'),'ö','oe'),'ü','ue'),'Ä','Ae'),'Ö','Oe'),'Ü','Ue'),'ß','ss') '''.format(where=where)
+        cursor.execute(sqlTemplate)
+        mlist = cursor.fetchall()
+        f = io.StringIO()
+        f.write('family_name,given_name,title,sex,street,street_number,appartment,postal_code,city,country,\n')
+        for m in mlist:
+            cstr = m[0]+','+m[1]+','+m[2]+','+m[3]+','+m[4]+','+m[5]+','+m[6]+','+m[7]+','+m[8]+','+m[9]+',\n'
+            f.write(cstr)
+        f.seek(0) # get cursor to beginning
+        return f
+    
     def checkPasswd(self, email, passwd):
         '''checks a password for an email'''
         cursor = self._connection.cursor()

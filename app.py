@@ -6,13 +6,14 @@ Base file of MemberBase
 
 import os
 import sqlite3
-from flask import Flask, render_template, request, send_from_directory, make_response, jsonify
+from flask import Flask, render_template, request, send_from_directory, make_response, jsonify, send_file
 from flask import url_for, redirect
 import flask_login
 import json
-import csv
+import csv, io
 from jinja2 import Template
 from modules import dbio, settingsIo
+from datetime import datetime, timedelta
 
 # global settings:
 
@@ -22,7 +23,6 @@ settings = settingsIo.settingsIo(settingsfile)
 dbfile = settings.get('dbfile')
 host = settings.get('host')
 port = settings.get('port')
-port = '5000' #TODO: remove when main-dev done
 debug = settings.get('debug')
 
 # WebServer stuff:
@@ -173,7 +173,7 @@ def manage():
         return '405 not allowed'
     members = db.getMembers()
     msJson = json.dumps(members, indent=2)
-    return render_template('manage.html', relroot='./', authuser=flask_login.current_user.id, msJson=msJson)
+    return render_template('manage.html', relroot='./', authuser=flask_login.current_user.id, msJson=msJson, magazine_name=settings.get('magazine_name'))
 
 @MemberBase.route('/manage/<mid>', methods=['GET'])
 @flask_login.login_required
@@ -298,6 +298,31 @@ def log():
     log = db.getLog()
     logJson = json.dumps(log, indent=2)
     return render_template('log.html', relroot='./', authuser=flask_login.current_user.id, logJson=logJson)
+
+@MemberBase.route('/csvExport/<selection>', methods=['GET'])
+@flask_login.login_required
+def csvExport(selection):
+    '''exports members as csvfile according to the selection'''
+    user = flask_login.current_user.id
+    db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return '405 not allowed'
+    sel = selection.split('_')
+    if sel[0] == 'mail':
+        csvfile = db.csvExportMail(sel[1])
+    elif sel[0] == 'addr':
+        csvfile = db.csvExportAddr(sel[1])
+    else:
+        return '404 not found'
+    mem = io.BytesIO()
+    mem.write(csvfile.getvalue().encode())
+    mem.seek(0)
+    return send_file(
+            mem,
+            download_name=f"" + datetime.now().strftime('%Y/%m/%d')+'_MemberList_'+selection+'.csv',
+            as_attachment=True,
+            mimetype='text/csv',
+            )
 
 @MemberBase.route('/_delete/<did>', methods=['DELETE'])
 @flask_login.login_required

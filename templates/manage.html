@@ -8,6 +8,20 @@
     <h1>MemberBase Management</h1>
     <p><a href="_logout">logout</a></p>
     <hr>
+    <h2>csv-Exporte</h2>
+    <h3>eMail-Verteiler</h3>
+    <ul>
+        <li><a href="{{ relroot }}csvExport/mail_n">Mailverteiler</a></li>
+        <li><a href="{{ relroot }}csvExport/mail_p">Protokoll</a></li>
+        <li><a href="{{ relroot }}csvExport/mail_m">{{ magazine_name }}</a></li>
+    </ul>
+    <h3>Adress-Verteiler</h3>
+    <ul>
+        <li><a href="{{ relroot }}csvExport/addr_p">Protokolle</a></li>
+        <li><a href="{{ relroot }}csvExport/addr_m">{{ magazine_name }}</a></li>
+        <li><a href="{{ relroot }}csvExport/addr_pm">Protokolle und {{ magazine_name }}</a></li>
+    </ul>
+    <hr>
     <h2>Alle Mitglieder</h2>
     <div id="memberlist"></div>
 </div>
@@ -18,10 +32,10 @@
 <script>
     var members = JSON.parse({{ msJson|tojson }});
     var out = '<table>';
-    out += '<tr><th>Nachname</th><th>Vorname</th><th>Geburtsdatum</th></tr>\n';
+    out += '<tr><th>Optionen</th><th>Nachname</th><th>Vorname</th><th>Geburtsdatum</th></tr>\n';
     for (var i=0; i<members.length; i++){
         out += '<tr>';
-        out += '<td><a href="{{ relroot }}manage/'+members[i].mid+'">Verwalten</a></td>';
+        out += '<td><a href="{{ relroot }}manage/'+members[i].mid+'">Edit &#9998;</a></td>';
         out += '<td><a href="{{ relroot }}member/'+members[i].mid+'">'+members[i].family_name+'</a></td>';
         out += '<td>'+members[i].given_name+'</td>';
         out += '<td>'+members[i].date_of_birth+'</td>';
