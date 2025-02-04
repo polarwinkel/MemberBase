@@ -209,9 +209,12 @@ def member(mid):
     else:
         groups = db.getGroups(mid)
     gJson = json.dumps(groups)
+    geos = db.getGeos()
+    geoJson = json.dumps(geos)
     manager = db.checkManager(user)
     return render_template('member.html', relroot='../', authuser=user, manager=manager, 
-            mJson=mJson, gJson=gJson, magazine_name=settings.get('magazine_name'))
+            mJson=mJson, gJson=gJson, magazine_name=settings.get('magazine_name'),
+            geoJson=geoJson)
 
 @MemberBase.route('/member', methods=['POST'])
 def memberNew():

@@ -142,12 +142,13 @@ class MbDb:
         sqlTemplate = '''UPDATE members SET street=?, street_number=?, 
                 appartment=?, postal_code=?, city=?, 
                 email_newsletter=?, email_protocols=?, email_magazine=?, 
-                allow_address_internal=?
+                allow_address_internal=?, geo_lat=?, geo_lon=?
                 WHERE mid=?'''
         cursor.execute(sqlTemplate, (m['street'], m['street_number'], 
                 m['appartment'], m['postal_code'], m['city'], 
                 m['email_newsletter'], m['email_protocols'], m['email_magazine'], 
-                m['allow_address_internal'], m['mid']))
+                m['allow_address_internal'], m['geo_lat'], m['geo_lon'], 
+                m['mid']))
         if len(m['password'])>=10:
             salt = uuid.uuid4().hex
             hashed_password = hashlib.sha512(m['password'].encode('utf-8') + salt.encode('utf-8')).hexdigest()
@@ -223,6 +224,25 @@ class MbDb:
                     'family_name'   : t[1],
                     'given_name'    : t[2],
                     'date_of_birth' : t[3]
+                })
+        return result
+    
+    def getGeos(self):
+        '''returns a list of all allowed member-locations'''
+        cursor = self._connection.cursor()
+        sqlTemplate = '''SELECT given_name, geo_lat, geo_lon FROM members
+                WHERE geo_lat NOT NULL AND allow_address_internal=1'''
+        cursor.execute(sqlTemplate, )
+        tup = cursor.fetchall()
+        self._connection.commit()
+        if tup is None:
+            return None
+        result = []
+        for t in tup:
+            result.append({
+                    'given_name'    : t[0],
+                    'geo_lat'       : t[1],
+                    'geo_lon'       : t[2]
                 })
         return result
     
