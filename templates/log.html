@@ -19,16 +19,13 @@
     var lg = JSON.parse({{ logJson|tojson }});
     console.log(lg);
     out = '<table>';
-    out += '<tr><th>timestamp</th><th>changed_mid</th><th>user_mid</th><th>remote_ip</th>address<th></th><th>old_data</th><th>new_data</th></tr>\n';
+    out += '<tr><th>timestamp</th><th>Mitglied</th><th>old_data</th><th>new_data</th></tr>\n';
     for (var i=0; i<lg.length; i++){
         out += '<tr>';
-        out += '<td>'+lg[i][0]+'</td>';
-        out += '<td>'+lg[i][1]+'</td>';
-        out += '<td>'+lg[i][2]+'</td>';
-        out += '<td>'+lg[i][3]+'</td>';
-        out += '<td>'+lg[i][4]+'</td>';
-        out += '<td>'+lg[i][5]+'</td>';
-        out += '<td>'+lg[i][6]+'</td>';
+        out += '<td>'+lg[i]['timestamp']+'</td>';
+        out += '<td><a href=member/"'+lg[i]['changed_mid']+'">'+lg[i]['family_name']+', '+lg[i]['given_name']+'</a></td>';
+        out += '<td>'+lg[i]['old_data']+'</td>';
+        out += '<td>'+lg[i]['new_data']+'</td>';
         out += '</tr>';
     }
     out += '</table>';

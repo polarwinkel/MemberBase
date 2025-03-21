@@ -17,7 +17,7 @@
 <script src="{{ relroot }}_static/polalert.js"></script>
 <script>
     var relroot = '{{ relroot }}';
-    var m = JSON.parse({{ mJson|tojson }})[0];
+    var m = JSON.parse({{ mJson|tojson }});
     
     function showMember(){
         out = '<table><tr><th>key</th><th>value</th></tr>';

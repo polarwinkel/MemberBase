@@ -40,16 +40,16 @@ class MbDb:
         mid = cursor.fetchone()
         return mid
     
-    def addMember(self, family_name,given_name,date_of_birth,birth_name='',title='',call_name='',sex='',street='',street_number='',appartment='',postal_code='',city='',state='',country='',email='',phone='',mobile='',iban='',bic='',join_date='',note_public='',note_manager=''):
+    def addMember(self, family_name,given_name,date_of_birth,birth_name='',title='',call_name='',sex='',street='',street_number='',appartment='',postal_code='',city='',state='',country='',email='',phone='',mobile='',iban='',bic='',join_date='',status='',note_public='',note_manager=''):
         '''adds a new member, returning its mid (or False if exists)'''
         if self.checkMember(family_name, given_name, date_of_birth) is not None:
             return False
         mid = huuid.new()
         # TODO: check if one with first 32bit exists already
         cursor = self._connection.cursor()
-        sqlTemplate = '''INSERT INTO members (mid,family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,note_public,note_manager)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'''
-        cursor.execute(sqlTemplate, (mid,family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,note_public,note_manager))
+        sqlTemplate = '''INSERT INTO members (mid,family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,status,note_public,note_manager)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'''
+        cursor.execute(sqlTemplate, (mid,family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,status,note_public,note_manager))
         self._connection.commit()
         sqlTemplate = '''SELECT mid FROM members 
                 WHERE family_name=? AND given_name=? AND date_of_birth=?'''
@@ -64,49 +64,49 @@ class MbDb:
     def getMember(self, mid):
         '''returns most information of a member'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,allow_address_internal,note_public,note_manager,last_update
+        sqlTemplate = '''SELECT family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,allow_address_internal,note_public,note_manager,last_update
                 FROM members WHERE mid LIKE ?'''
         cursor.execute(sqlTemplate, (mid+'%', ))
-        tup = cursor.fetchall()
+        m = cursor.fetchone()
         self._connection.commit()
-        if tup is None:
+        if m is None:
             return None
-        result = []
-        for t in tup:
-            result.append({
-                    'mid'                   : mid,
-                    'family_name'           : t[0],
-                    'given_name'            : t[1],
-                    'date_of_birth'         : t[2],
-                    'birth_name'            : t[3],
-                    'title'                 : t[4],
-                    'call_name'             : t[5],
-                    'sex'                   : t[6],
-                    'street'                : t[7],
-                    'street_number'         : t[8],
-                    'appartment'            : t[9],
-                    'postal_code'           : t[10],
-                    'city'                  : t[11],
-                    'state'                 : t[12],
-                    'country'               : t[13],
-                    'geo_lat'               : t[14],
-                    'geo_lon'               : t[15],
-                    'email'                 : t[16],
-                    'phone'                 : t[17],
-                    'mobile'                : t[18],
-                    'iban'                  : t[19],
-                    'bic'                   : t[20],
-                    'join_date'             : t[21],
-                    'allow_debit'           : t[22],
-                    'email_newsletter'      : t[23],
-                    'email_protocols'       : t[24],
-                    'email_magazine'        : t[25],
-                    'allow_images_public'   : t[26],
-                    'allow_address_internal': t[27],
-                    'note_public'           : t[28],
-                    'note_manager'          : t[29],
-                    'last_update'           : t[30]
-                })
+        result = {
+                'mid'                   : mid,
+                'family_name'           : m[0],
+                'given_name'            : m[1],
+                'date_of_birth'         : m[2],
+                'birth_name'            : m[3],
+                'title'                 : m[4],
+                'call_name'             : m[5],
+                'sex'                   : m[6],
+                'street'                : m[7],
+                'street_number'         : m[8],
+                'appartment'            : m[9],
+                'postal_code'           : m[10],
+                'city'                  : m[11],
+                'state'                 : m[12],
+                'country'               : m[13],
+                'geo_lat'               : m[14],
+                'geo_lon'               : m[15],
+                'email'                 : m[16],
+                'phone'                 : m[17],
+                'mobile'                : m[18],
+                'iban'                  : m[19],
+                'bic'                   : m[20],
+                'join_date'             : m[21],
+                'status'                : m[22],
+                'privacy_accepted'      : m[23],
+                'allow_debit'           : m[24],
+                'email_newsletter'      : m[25],
+                'email_protocols'       : m[26],
+                'email_magazine'        : m[27],
+                'allow_images_public'   : m[28],
+                'allow_address_internal': m[29],
+                'note_public'           : m[30],
+                'note_manager'          : m[31],
+                'last_update'           : m[32]
+                }
         return result
     
     def updateMember(self, user, ip, m):
@@ -130,14 +130,28 @@ class MbDb:
             m['allow_address_internal']=0
         cursor = self._connection.cursor()
         # log:
-        sqlTemplate = '''SELECT * FROM members WHERE mid=?'''
-        cursor.execute(sqlTemplate, (m['mid'], ))
-        # TODO: log only changes; set 'address' to True if address changed
+        mOld = self.getMember(m['mid'])
+        old = {}
+        new = {}
+        for key in m:
+            if key in mOld.keys() and mOld[key] != m[key]:
+                old[key] = mOld[key]
+                new[key] = m[key]
+        address = 0
+        email = 0
+        payment = 0
+        for key in new:
+            if key in ['family_name','given_name','title','street','street_number','appartment','postal_code','city','state','country']:
+                address = 1
+            if key == 'email':
+                email = 1
+            if key in ['iban','bic','allow_debit']:
+                payment = 1
         sqlTemplate = '''INSERT INTO log 
-                (timestamp,changed_mid,user_mid,remote_ip,old_data,new_data)
-                VALUES (CURRENT_TIMESTAMP,?,?,?,?,?)'''
+                (timestamp,changed_mid,user_mid,remote_ip,address,email,payment,old_data,new_data)
+                VALUES (CURRENT_TIMESTAMP,?,?,?,?,?,?,?,?)'''
         mOld = cursor.fetchone()
-        cursor.execute(sqlTemplate, (m['mid'],self.getMidFromMail(user),ip,str(mOld),str(m)))
+        cursor.execute(sqlTemplate, (m['mid'],self.getMidFromMail(user),ip,address,email,payment,str(old),str(new)))
         # update:
         sqlTemplate = '''UPDATE members SET street=?, street_number=?, 
                 appartment=?, postal_code=?, city=?, 
@@ -363,14 +377,37 @@ class MbDb:
         hashed = hashlib.sha512(passwd.encode('utf-8') + u[1].encode('utf-8')).hexdigest()
         return u[0] == hashed
     
-    def getLog(self):
+    def getLog(self, dataset=''):
         '''get the last 1000 log-entries'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT * FROM log'''
+        if dataset=='':
+            sqlTemplate = '''SELECT 
+                    timestamp, changed_mid, user_mid, family_name, given_name, 
+                    remote_ip, old_data, new_data 
+                    FROM log JOIN members ON log.changed_mid=members.mid
+                    ORDER BY timestamp DESC LIMIT 1000'''
+        elif dataset=='address':
+            sqlTemplate = '''SELECT 
+                    timestamp, changed_mid, user_mid, family_name, given_name,
+                    remote_ip, old_data, new_data 
+                    FROM log JOIN members ON log.changed_mid=members.mid
+                    ORDER BY timestamp DESC LIMIT 1000'''
         cursor.execute(sqlTemplate, )
-        res = cursor.fetchall()
+        tup = cursor.fetchall()
         self._connection.commit()
-        return res
+        log = []
+        for l in tup:
+            log.append({
+                    'timestamp'     : l[0],
+                    'changed_mid'   : l[1],
+                    'user_mid'      : l[2],
+                    'family_name'   : l[3],
+                    'given_name'    : l[4],
+                    'remote_ip'     : l[5],
+                    'old_data'      : l[6],
+                    'new_data'      : l[7]
+                })
+        return log
     
     def deleteMember(self, mid):
         '''delete a member'''

@@ -27,8 +27,7 @@
     <input type="text" class="formdata" name="email2" id="email2"><br>
     <p><i>(zweimal eingeben um Tippfehler zu vermeiden!)</i></p>
     <h2>eMail-Optionen</h2>
-    <p>Welche Informationen möchtest du per eMail statt per Post erhalten?<br>
-    <b>Die Informationen werden dann nicht mehr per Post versendet!</b></p>
+    <p>Welche Informationen möchtest du per eMail (und <b>nicht mehr per Post</b>) erhalten?</p>
     <label for="email_newsletter">eMail-Verteiler:</label>
     <input type="checkbox" class="formdata" name="email_newsletter" id="email_newsletter"><br>
     <label for="email_protocols">Protokolle:</label>
@@ -36,11 +35,16 @@
     <label for="email_magazine">{{ magazine_name }}:</label>
     <input type="checkbox" class="formdata" name="email_magazine" id="email_magazine"><br>
     <h2>Datenschutz</h2>
+    <p><details><summary>Zustimmung zur Datenschutzbestimmung</summary>
+        TODO
+    </details></p>
+    <label for="privacy_accepted">Zustimmung:</label>
+    <input type="checkbox" class="formdata" name="privacy_accepted" id="privacy_accepted"><br><br>
+    <p>Möchtest du dass andere Mitglieder deine Adresse und deine eMail-Adresse hier nachschauen können?</p>
     <label for="allow_address_internal">Adresse sichtbar:</label>
     <input type="checkbox" class="formdata" name="allow_address_internal" id="allow_address_internal"><br>
     <input type="hidden" class="formdata" name="geo_lat" id="geo_lat">
     <input type="hidden" class="formdata" name="geo_lon" id="geo_lon">
-    <p>Wenn du dies auswählst können andere Mitglieder deine Adresse und deine eMail-Adresse sehen.</p>
     <h3>Passwort einrichten</h3>
     <p>Diese Seite ist durch die URL geschützt.<br>
         Optional kannst du auch ein Passwort festlegen, dann ist diese Seite ohne Passwort nicht mehr erreichbar.<br>
@@ -62,17 +66,20 @@
     <hr>
     
     <h2>Karte</h2>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <div id="map" style="width: 600px; height: 400px; max-width:100%;"><button onclick="showMap()">Zeige Karte</button></div>
-
+    <p>Hier siehst du die Wohnorte aller Mitglieder, die der Sichtbarkeit der eigenen Adresse zugestimmt haben:<br>
+    <i>(nach Zustimmung und Speicherung diese Seite einmal neu laden!)</i></p>
+    <div id="mapd">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <div id="map" style="width: 600px; height: 400px; max-width:100%;"><button onclick="showMap()">Zeige Karte</button></div>
+    </div>
 </div>
 
 <script src="{{ relroot }}_static/getFormJson.js"></script>
 <script src="{{ relroot }}_static/polalert.js"></script>
 <script>
     var relroot = '{{ relroot }}';
-    var m = JSON.parse({{ mJson|tojson }})[0];
+    var m = JSON.parse({{ mJson|tojson }});
     var g = JSON.parse({{ gJson|tojson }});
     var geos = JSON.parse({{ geoJson|tojson }});
     var manager = JSON.parse({{ manager|tojson }});
@@ -158,7 +165,15 @@
             pa.error('Das Passwort entspricht noch nicht den Anforderungen!');
             return;
         }
-        getGeo();
+        if (document.getElementById('allow_address_internal').checked) {
+            try {
+                getGeo();
+            } catch {
+                pa.boolean('<b>Warnung:</b><br>Adresse nicht gefunden!<br>Dennoch übernehmen?');
+            }
+        } else {
+            submit();
+        }
     }
     
     async function submit(formJson) {

@@ -8,12 +8,13 @@
     <h1>CSV-Import</h1>
     <p>Die Titelzeile <b>muss genau so</b> sein wie folgt:<br>
          <i>(um sicher zu gehen, dass du weißt was du tust und um dich zum Nachdenken zu zwingen bevor du hier Schäden anrichtest!)</i><br>
-        <code><pre>family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,note_public,note_manager</pre></code>
-        Der <code>family_name</code> und der <code>given_name</code> <b>muss</b> vergeben sein, der Delimiter ist <code>,</code>, der Quodechar <code>"</code>, das Encoding ist <code>utf-8</code>.
+        <code><pre>family_name;given_name;date_of_birth;birth_name;title;call_name;sex;street;street_number;appartment;postal_code;city;state;country;email;phone;mobile;iban;bic;join_date;status;note_public;note_manager</pre></code><br>
+        Der <code>family_name</code> und der <code>given_name</code> <b>muss</b> vergeben sein, der Delimiter ist <code>;</code>, der Quodechar <code>"</code>, das Encoding ist <code>utf-8</code>.<br>
+        Tipp: Die Zeile in eine neue Textdatei kopieren und als CSV speichern, dann mit einem Tabellenkalkulationsprogramm öffnen und die eigenen Daten passend hinein kopieren.
     </p>
     <input type="file" id="file" name="file" /><br />
     <p style="color: red;">WARNUNG/TODO: Aktuell werden alle Nutzer neu angelegt wo nicht Nachname, Vorname und Geburtsdatum EXAKT gleich sind!<br>
-    !!! NUR FÜR ERSTIMPORT ODER DEVELOPMENT BENUTZEN !!!</p>
+    Nur für Erstimport oder Development benutzen!</p>
     <button onclick="uploadCsv()">Importieren</button>
     <div id="changes">
     </div>

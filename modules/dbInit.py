@@ -37,6 +37,8 @@ def checkTables(db):
             iban VARCHAR(32),
             bic VARCHAR(32),
             join_date DATE,
+            status VARCHAR(256),
+            privacy_accepted BOOLEAN,
             allow_debit BOOLEAN,
             email_newsletter BOOLEAN,
             email_protocols BOOLEAN,
@@ -95,6 +97,8 @@ def checkTables(db):
             user_mid VARCHAR(64),
             remote_ip VARCHAR(64),
             address BOOLEAN,
+            email BOOLEAN,
+            payment BOOLEAN,
             old_data TEXT,
             new_data TEXT
         );'''
