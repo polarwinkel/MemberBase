@@ -124,6 +124,10 @@ class MbDb:
             m['email_magazine']=1
         else:
             m['email_magazine']=0
+        if m['privacy_accepted']=='on':
+            m['privacy_accepted']=1
+        else:
+            m['privacy_accepted']=0
         if m['allow_address_internal']=='on':
             m['allow_address_internal']=1
         else:
