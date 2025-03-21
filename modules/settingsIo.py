@@ -16,6 +16,7 @@ class settingsIo:
             s['debug'] = True
             s['organame'] = 'society'
             s['magazine_name'] = 'magazine'
+            s['privacy_declaration'] = ''
             s['admin']=''
             s['secret_key']=uuid.uuid4().hex
             # extensions to be used by python-markdown:
@@ -40,6 +41,8 @@ class settingsIo:
             return self.s['organame']
         elif key=='magazine_name':
             return self.s['magazine_name']
+        elif key=='privacy_declaration':
+            return self.s['privacy_declaration']
         elif key=='admin':
             return self.s['admin']
         elif key=='secret_key':
