@@ -64,7 +64,7 @@ class MbDb:
     def getMember(self, mid):
         '''returns most information of a member'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,allow_address_internal,note_public,note_manager,last_update
+        sqlTemplate = '''SELECT family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,privacy_accepted,allow_address_internal,note_public,note_manager,last_update
                 FROM members WHERE mid LIKE ?'''
         cursor.execute(sqlTemplate, (mid+'%', ))
         m = cursor.fetchone()
@@ -102,10 +102,11 @@ class MbDb:
                 'email_protocols'       : m[26],
                 'email_magazine'        : m[27],
                 'allow_images_public'   : m[28],
-                'allow_address_internal': m[29],
-                'note_public'           : m[30],
-                'note_manager'          : m[31],
-                'last_update'           : m[32]
+                'privacy_accepted'      : m[29],
+                'allow_address_internal': m[30],
+                'note_public'           : m[31],
+                'note_manager'          : m[32],
+                'last_update'           : m[33]
                 }
         return result
     
@@ -160,12 +161,12 @@ class MbDb:
         sqlTemplate = '''UPDATE members SET street=?, street_number=?, 
                 appartment=?, postal_code=?, city=?, 
                 email_newsletter=?, email_protocols=?, email_magazine=?, 
-                allow_address_internal=?, geo_lat=?, geo_lon=?
+                privacy_accepted=?, allow_address_internal=?, geo_lat=?, geo_lon=?
                 WHERE mid=?'''
         cursor.execute(sqlTemplate, (m['street'], m['street_number'], 
                 m['appartment'], m['postal_code'], m['city'], 
                 m['email_newsletter'], m['email_protocols'], m['email_magazine'], 
-                m['allow_address_internal'], m['geo_lat'], m['geo_lon'], 
+                m['privacy_accepted'], m['allow_address_internal'], m['geo_lat'], m['geo_lon'], 
                 m['mid']))
         if len(m['password'])>=10:
             salt = uuid.uuid4().hex
