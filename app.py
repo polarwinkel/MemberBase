@@ -212,7 +212,6 @@ def member(mid):
     geos = db.getGeos()
     geoJson = json.dumps(geos)
     manager = db.checkManager(user)
-    print(settings.get('privacy_declaration'))
     return render_template('member.html', relroot='../', authuser=user, manager=manager, 
             mJson=mJson, gJson=gJson, magazine_name=settings.get('magazine_name'),
             privacy_declaration=settings.get('privacy_declaration'), geoJson=geoJson)

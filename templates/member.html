@@ -107,6 +107,7 @@
         document.getElementById('email_newsletter').checked = m.email_newsletter;
         document.getElementById('email_protocols').checked = m.email_protocols;
         document.getElementById('email_magazine').checked = m.email_magazine;
+        document.getElementById('privacy_accepted').checked = m.privacy_accepted;
         document.getElementById('allow_address_internal').checked = m.allow_address_internal;
         document.getElementById('geo_lat').checked = m.geo_lat;
         document.getElementById('geo_lon').checked = m.geo_lon;
@@ -163,6 +164,10 @@
         var pwInput = document.getElementById('password');
         if (pwInput.style.color != 'green'){
             pa.error('Das Passwort entspricht noch nicht den Anforderungen!');
+            return;
+        }
+        if (!(document.getElementById('privacy_accepted').checked)) {
+            pa.error('Du musst die Datenschutzbestimmung akzeptieren um hier Einstellungen vornehmen zu können!');
             return;
         }
         if (document.getElementById('allow_address_internal').checked) {
