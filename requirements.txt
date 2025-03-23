@@ -4,3 +4,4 @@ python3-flask
 python3-flask-login
 python3-yaml
 python3-passlib
+python3-markdown

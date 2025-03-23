@@ -14,6 +14,7 @@ import csv, io
 from jinja2 import Template
 from modules import dbio, settingsIo
 from datetime import datetime, timedelta
+from markdown import markdown as md2html
 
 # global settings:
 
@@ -196,9 +197,12 @@ def member(mid):
     member = db.getMember(mid)
     if member == None:
         return 404
+    elif len(mid)==19 or len(mid)==29:
+        print(member['mid'])
+        return redirect('/member/'+member['mid'])
     if flask_login.current_user.is_anonymous or flask_login.current_user.id == None:
         if db.checkPasswdSet(mid):
-            return '405 not allowed'
+            return redirect('/')
         else:
             user = '[private URL]'
     else:
@@ -212,9 +216,10 @@ def member(mid):
     geos = db.getGeos()
     geoJson = json.dumps(geos)
     manager = db.checkManager(user)
+    privDec = md2html(settings.get('privacy_declaration'))
     return render_template('member.html', relroot='../', authuser=user, manager=manager, 
             mJson=mJson, gJson=gJson, magazine_name=settings.get('magazine_name'),
-            privacy_declaration=settings.get('privacy_declaration'), geoJson=geoJson)
+            privacy_declaration=privDec, geoJson=geoJson)
 
 @MemberBase.route('/member', methods=['POST'])
 def memberNew():

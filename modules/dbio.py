@@ -64,7 +64,7 @@ class MbDb:
     def getMember(self, mid):
         '''returns most information of a member'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,privacy_accepted,allow_address_internal,note_public,note_manager,last_update
+        sqlTemplate = '''SELECT mid, family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,privacy_accepted,allow_address_internal,note_public,note_manager,last_update
                 FROM members WHERE mid LIKE ?'''
         cursor.execute(sqlTemplate, (mid+'%', ))
         m = cursor.fetchone()
@@ -72,41 +72,41 @@ class MbDb:
         if m is None:
             return None
         result = {
-                'mid'                   : mid,
-                'family_name'           : m[0],
-                'given_name'            : m[1],
-                'date_of_birth'         : m[2],
-                'birth_name'            : m[3],
-                'title'                 : m[4],
-                'call_name'             : m[5],
-                'sex'                   : m[6],
-                'street'                : m[7],
-                'street_number'         : m[8],
-                'appartment'            : m[9],
-                'postal_code'           : m[10],
-                'city'                  : m[11],
-                'state'                 : m[12],
-                'country'               : m[13],
-                'geo_lat'               : m[14],
-                'geo_lon'               : m[15],
-                'email'                 : m[16],
-                'phone'                 : m[17],
-                'mobile'                : m[18],
-                'iban'                  : m[19],
-                'bic'                   : m[20],
-                'join_date'             : m[21],
-                'status'                : m[22],
-                'privacy_accepted'      : m[23],
-                'allow_debit'           : m[24],
-                'email_newsletter'      : m[25],
-                'email_protocols'       : m[26],
-                'email_magazine'        : m[27],
-                'allow_images_public'   : m[28],
-                'privacy_accepted'      : m[29],
-                'allow_address_internal': m[30],
-                'note_public'           : m[31],
-                'note_manager'          : m[32],
-                'last_update'           : m[33]
+                'mid'                   : m[0],
+                'family_name'           : m[1],
+                'given_name'            : m[2],
+                'date_of_birth'         : m[3],
+                'birth_name'            : m[4],
+                'title'                 : m[5],
+                'call_name'             : m[6],
+                'sex'                   : m[7],
+                'street'                : m[8],
+                'street_number'         : m[9],
+                'appartment'            : m[10],
+                'postal_code'           : m[11],
+                'city'                  : m[12],
+                'state'                 : m[13],
+                'country'               : m[14],
+                'geo_lat'               : m[15],
+                'geo_lon'               : m[16],
+                'email'                 : m[17],
+                'phone'                 : m[18],
+                'mobile'                : m[19],
+                'iban'                  : m[20],
+                'bic'                   : m[21],
+                'join_date'             : m[22],
+                'status'                : m[23],
+                'privacy_accepted'      : m[24],
+                'allow_debit'           : m[25],
+                'email_newsletter'      : m[26],
+                'email_protocols'       : m[27],
+                'email_magazine'        : m[28],
+                'allow_images_public'   : m[29],
+                'privacy_accepted'      : m[30],
+                'allow_address_internal': m[31],
+                'note_public'           : m[32],
+                'note_manager'          : m[33],
+                'last_update'           : m[34]
                 }
         return result
     
@@ -158,12 +158,12 @@ class MbDb:
         mOld = cursor.fetchone()
         cursor.execute(sqlTemplate, (m['mid'],self.getMidFromMail(user),ip,address,email,payment,str(old),str(new)))
         # update:
-        sqlTemplate = '''UPDATE members SET street=?, street_number=?, 
+        sqlTemplate = '''UPDATE members SET call_name = ?, street=?, street_number=?, 
                 appartment=?, postal_code=?, city=?, 
                 email_newsletter=?, email_protocols=?, email_magazine=?, 
                 privacy_accepted=?, allow_address_internal=?, geo_lat=?, geo_lon=?
                 WHERE mid=?'''
-        cursor.execute(sqlTemplate, (m['street'], m['street_number'], 
+        cursor.execute(sqlTemplate, (m['call_name'], m['street'], m['street_number'], 
                 m['appartment'], m['postal_code'], m['city'], 
                 m['email_newsletter'], m['email_protocols'], m['email_magazine'], 
                 m['privacy_accepted'], m['allow_address_internal'], m['geo_lat'], m['geo_lon'], 
@@ -249,7 +249,7 @@ class MbDb:
     def getGeos(self):
         '''returns a list of all allowed member-locations'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT given_name, geo_lat, geo_lon FROM members
+        sqlTemplate = '''SELECT given_name, call_name, geo_lat, geo_lon FROM members
                 WHERE geo_lat NOT NULL AND allow_address_internal=1'''
         cursor.execute(sqlTemplate, )
         tup = cursor.fetchall()
@@ -258,11 +258,14 @@ class MbDb:
             return None
         result = []
         for t in tup:
-            result.append({
-                    'given_name'    : t[0],
-                    'geo_lat'       : t[1],
-                    'geo_lon'       : t[2]
-                })
+            m = {
+                    'name'      : t[0],
+                    'geo_lat'   : t[2],
+                    'geo_lon'   : t[3]
+                }
+            if t[1] != '':
+                m['name'] = t[1]
+            result.append(m)
         return result
     
     def getNotMembers(self, gid):
