@@ -39,7 +39,7 @@
     <label for="email_magazine">{{ magazine_name }}:</label>
     <input type="checkbox" class="formdata" name="email_magazine" id="email_magazine"><br>
     <h2>Datenschutz</h2>
-    <p><details><summary>Zustimmung zur Datenschutzbestimmung</summary>
+    <p><details><summary>Datenschutzbestimmung</summary>
         <hr>
         {{ privacy_declaration|safe }}
         <hr>
@@ -47,7 +47,7 @@
     <label for="privacy_accepted">Zustimmung:</label>
     <input type="checkbox" class="formdata" name="privacy_accepted" id="privacy_accepted"><br><br>
     <h3>Sichtbarkeit</h3>
-    <p>Möchtest du dass andere Mitglieder deine Adresse über deinen Rufnamen oder, falls der Rufname nicht vergeben ist, über den Vornamen nachschauen können?</p>
+    <p>Möchtest du, dass andere Mitglieder deine Adresse über deinen Rufnamen oder, falls der nicht vergeben ist, über den Vornamen nachschauen können?</p>
     <label for="allow_address_internal">Adresse sichtbar:</label>
     <input type="checkbox" class="formdata" name="allow_address_internal" id="allow_address_internal"><br>
     <input type="hidden" class="formdata" name="geo_lat" id="geo_lat">
@@ -57,9 +57,9 @@
         Optional kannst du auch ein Passwort festlegen, dann ist diese Seite ohne Passwort nicht mehr erreichbar.<br>
         <i>(Hinweis: Das Zurücksetzen eines vergessenen Passwortes ist aktuell nur durch den Vorstand möglich!)</i></p>
     <label for="password">Passwort:</label>
-    <input type="password" class="formdata" name="password" id="password" oninput="pwType(this.value)" style="color:green"><br>
+    <input type="password" autocomplete="off" class="formdata" name="password" id="password" oninput="pwType(this.value)" style="color:green"><br>
     <label for="password2">Passwort-Verifikation:</label>
-    <input type="password" class="formdata" name="password2" id="password2"><br>
+    <input type="password" autocomplete="off" class="formdata" name="password2" id="password2"><br>
     <p>Das Passwort muss:
         <ul>
             <li><b>mindestens <u>10 Zeichen</u></b> lang sein</li>
@@ -74,7 +74,7 @@
     
     <h2>Andere Mitglieder</h2>
     <p>Hier siehst du die Wohnorte aller Mitglieder, die der Sichtbarkeit der eigenen Adresse zugestimmt haben.<br>
-    Eine Suche nach Mitgliedern noch in Planung.<br>
+    Eine Suchmöglichkeit nach Mitgliedern ist noch in Planung.<br>
     <i>(Nach Änderungen oben diese Seite einmal neu laden!)</i></p>
     <div id="mapd">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>

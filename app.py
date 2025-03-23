@@ -323,6 +323,8 @@ def csvExport(selection):
         csvfile = db.csvExportMail(sel[1])
     elif sel[0] == 'addr':
         csvfile = db.csvExportAddr(sel[1])
+    elif sel[0] == 'addr':
+        csvfile = db.csvExportAddr(sel[1])
     else:
         return '404 not found'
     mem = io.BytesIO()
