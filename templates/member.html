@@ -11,6 +11,8 @@
     <h1 id="name"></h1>
     <label for="call_name">Rufname:</label>
     <input type="text" class="formdata" name="call_name" id="call_name"><br>
+    <label for="title">Titel:</label>
+    <input type="text" class="formdata" name="title" id="title"><br>
     <h2>Adresse:</h2>
     <label for="street">Straße:</label>
     <input type="text" class="formdata" name="street" id="street"><br>
@@ -38,7 +40,9 @@
     <input type="checkbox" class="formdata" name="email_magazine" id="email_magazine"><br>
     <h2>Datenschutz</h2>
     <p><details><summary>Zustimmung zur Datenschutzbestimmung</summary>
+        <hr>
         {{ privacy_declaration|safe }}
+        <hr>
     </details></p>
     <label for="privacy_accepted">Zustimmung:</label>
     <input type="checkbox" class="formdata" name="privacy_accepted" id="privacy_accepted"><br><br>
@@ -101,6 +105,7 @@
     function showMember() {
         document.getElementById('mid').value = m.mid;
         document.getElementById('name').innerHTML = m.title+' '+m.given_name+' '+m.family_name;
+        document.getElementById('title').value = m.title;
         document.getElementById('street').value = m.street;
         document.getElementById('street_number').value = m.street_number;
         document.getElementById('appartment').value = m.appartment;

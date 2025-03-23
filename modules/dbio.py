@@ -158,12 +158,12 @@ class MbDb:
         mOld = cursor.fetchone()
         cursor.execute(sqlTemplate, (m['mid'],self.getMidFromMail(user),ip,address,email,payment,str(old),str(new)))
         # update:
-        sqlTemplate = '''UPDATE members SET call_name = ?, street=?, street_number=?, 
-                appartment=?, postal_code=?, city=?, 
+        sqlTemplate = '''UPDATE members SET title = ?, call_name = ?, 
+                street=?, street_number=?, appartment=?, postal_code=?, city=?, 
                 email_newsletter=?, email_protocols=?, email_magazine=?, 
                 privacy_accepted=?, allow_address_internal=?, geo_lat=?, geo_lon=?
                 WHERE mid=?'''
-        cursor.execute(sqlTemplate, (m['call_name'], m['street'], m['street_number'], 
+        cursor.execute(sqlTemplate, (m['title'], m['call_name'], m['street'], m['street_number'], 
                 m['appartment'], m['postal_code'], m['city'], 
                 m['email_newsletter'], m['email_protocols'], m['email_magazine'], 
                 m['privacy_accepted'], m['allow_address_internal'], m['geo_lat'], m['geo_lon'], 
@@ -388,7 +388,7 @@ class MbDb:
     def getLog(self, dataset=''):
         '''get the last 1000 log-entries'''
         cursor = self._connection.cursor()
-        if dataset=='':
+        if dataset=='all':
             sqlTemplate = '''SELECT 
                     timestamp, changed_mid, user_mid, family_name, given_name, 
                     remote_ip, old_data, new_data 
@@ -399,6 +399,7 @@ class MbDb:
                     timestamp, changed_mid, user_mid, family_name, given_name,
                     remote_ip, old_data, new_data 
                     FROM log JOIN members ON log.changed_mid=members.mid
+                    WHERE log.address == 1
                     ORDER BY timestamp DESC LIMIT 1000'''
         cursor.execute(sqlTemplate, )
         tup = cursor.fetchall()

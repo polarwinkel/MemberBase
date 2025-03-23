@@ -298,17 +298,17 @@ def groupAddMember():
     db.addGroupMember(job['gid'], job['addMember'])
     return 'ok'
 
-@MemberBase.route('/log', methods=['GET'])
+@MemberBase.route('/log/<dataset>', methods=['GET'])
 @flask_login.login_required
-def log():
+def log(dataset = ''):
     '''show log'''
     user = flask_login.current_user.id
     db = dbio.MbDb(dbfile)
     if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
         return '405 not allowed'
-    log = db.getLog()
+    log = db.getLog(dataset)
     logJson = json.dumps(log, indent=2)
-    return render_template('log.html', relroot='./', authuser=flask_login.current_user.id, logJson=logJson)
+    return render_template('log.html', relroot='../', authuser=flask_login.current_user.id, logJson=logJson)
 
 @MemberBase.route('/csvExport/<selection>', methods=['GET'])
 @flask_login.login_required
