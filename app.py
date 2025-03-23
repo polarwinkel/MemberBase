@@ -150,7 +150,10 @@ def admin():
     msJson = json.dumps(members, indent=2)
     groups = db.getGroups()
     gJson = json.dumps(groups, indent=2)
-    return render_template('admin.html', relroot='./', authuser=flask_login.current_user.id, sJson=sJson, msJson=msJson, gJson=gJson)
+    return render_template('admin.html', relroot='./', 
+            authuser=flask_login.current_user.id, sJson=sJson, 
+            msJson=msJson, gJson=gJson, 
+            privacy_declaration = settings.get('privacy_declaration'))
 
 @MemberBase.route('/_adminSaveSettings', methods=['PUT'])
 @flask_login.login_required

@@ -23,7 +23,9 @@
     <label for="magazine_name">Mitglieder-Zeitung:</label>
     <input type="text" class="formdata" name="magazine_name" id="magazine_name"><br>
     <label for="privacy_declaration">Datenschutz-Erklärung:</label>
-    <textarea type="text" class="formdata" name="privacy_declaration" id="privacy_declaration"></textarea><br>
+    <textarea type="text" class="formdata" name="privacy_declaration" id="privacy_declaration">
+        {{ privacy_declaration }}
+    </textarea><br>
     <button id="submit" onclick="submit()">Änderungen speichern</button>
     <hr>
     <p><a href="{{ relroot }}manage">Management</a></p>
