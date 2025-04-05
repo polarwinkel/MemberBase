@@ -17,13 +17,12 @@
 <script>
     var relroot = '{{ relroot }}';
     var lg = JSON.parse({{ logJson|tojson }});
-    console.log(lg);
     out = '<table>';
     out += '<tr><th>timestamp</th><th>Mitglied</th><th>old_data</th><th>new_data</th></tr>\n';
     for (var i=0; i<lg.length; i++){
         out += '<tr>';
         out += '<td>'+lg[i]['timestamp']+'</td>';
-        out += '<td><a href=member/"'+lg[i]['changed_mid']+'">'+lg[i]['family_name']+', '+lg[i]['given_name']+'</a></td>';
+        out += '<td><a href="{{ relroot }}member/'+lg[i]['changed_mid']+'">'+lg[i]['family_name']+', '+lg[i]['given_name']+'</a></td>';
         out += '<td>'+lg[i]['old_data']+'</td>';
         out += '<td>'+lg[i]['new_data']+'</td>';
         out += '</tr>';

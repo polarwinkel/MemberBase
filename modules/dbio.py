@@ -98,6 +98,9 @@ class MbDb:
     
     def fixBooleans(self, m):
         '''fix boolean-values to int'''
+        for key in m:
+            if m[key]=='null':
+                m[key]=None
         if m['title_show'] in ['on', 1, '1', True, 'true', 'True']:
             m['title_show']=1
         elif m['title_show'] in ['', 'null', 'Null', 'NULL', None]:
@@ -151,6 +154,8 @@ class MbDb:
                 else:
                     lOld['password'] = '[set]'
                 lNew['password'] = '[new password]'
+        if lOld == {} and lNew == {}:
+            return False
         address = 0
         email = 0
         payment = 0
@@ -166,11 +171,14 @@ class MbDb:
                 (timestamp,changed_mid,user_mid,remote_ip,address,email,payment,old_data,new_data)
                 VALUES (CURRENT_TIMESTAMP,?,?,?,?,?,?,?,?)'''
         cursor.execute(sqlTemplate, (mNew['mid'],self.getMidFromMail(user),ip,address,email,payment,str(lOld),str(lNew)))
+        return True
     
     def updateMember(self, user, ip, m):
         '''update basic data of a member'''
         m = self.fixBooleans(m)
-        self.log(user, ip, m)
+        changed = self.log(user, ip, m)
+        if not changed:
+            return 'nothing changed'
         # update:
         cursor = self._connection.cursor()
         sqlTemplate = '''UPDATE members SET title=?, title_show=?, call_name=?, 
@@ -193,7 +201,10 @@ class MbDb:
     
     def updateMemberFull(self, user, ip, m):
         '''updates all information of a member (for management-use only)'''
-        self.log(user, ip, m)
+        m = self.fixBooleans(m)
+        changed = self.log(user, ip, m)
+        if not changed:
+            return 'nothing changed'
         cursor = self._connection.cursor()
         sqlTemplate = 'UPDATE members SET '
         values = ()
