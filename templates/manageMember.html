@@ -9,8 +9,10 @@
 </nav>
 <div id="content">
     <h1>Mitglied verwalten</h1>
-    <p>TODO: Bearbeiten ermöglichen</p>
+    <p><b>Warnung:</b> Nur die Felder bearbeiten von denen du weißt was sie tun!</p>
+    <p><b>Warnung:</b> Boolean-Felder (Ja-Nein-Felder) müssen "1" (="Ja"), "0" (="Nein") oder "null" (="unbekannt") enthalten!</p>
     <div id="data"></div>
+    <button id="submit" onclick="submit()">Änderungen speichern</button>
 </div>
 
 <script src="{{ relroot }}_static/getFormJson.js"></script>
@@ -23,12 +25,39 @@
         out = '<table><tr><th>key</th><th>value</th></tr>';
         for (var key in m) {
             out += '<tr><td>'+key+'</td>';
-            out += '<td>'+m[key]+'</td></tr>';
+            out += '<td>';
+            out += '<input type="text" class="formdata" name="'+key+'" id="'+key+'" ';
+            if (key=='mid' || key=='pwsalt' || key=='pwhash') {
+                out += 'value="'+m[key]+'" disabled>';
+            } else {
+                out += 'value="'+m[key]+'">';
+            }
+            out += '</td></tr>';
         }
         out += '</table>';
         document.getElementById('data').innerHTML = out;
     }
     showMember();
+    async function submit() {
+        // send form to server
+        var formJson = getFormJson();
+        var putUrl = relroot+'memberAdmin/'+m.mid;
+        try{
+            const response = await fetch(putUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formJson)
+            });
+            response.text().then(function (text) {
+                if (text=='ok' && response.status==200) pa.message('Erfolgreich gespeichert!');
+                else pa.warning(text);
+            });
+        } catch(err) {
+            alert(err);
+        }
+    }
 </script>
 
 {% endblock %}

@@ -122,30 +122,50 @@ class MbDb:
         result = {}
         keys = list(map(lambda x: x[0], cursor.description))
         for k in keys:
-            result[k] = m[keys.index(k)]
+            if (k=='pwsalt' or k=='pwhash') and m[keys.index(k)]!=None:
+                # don't show password-hashes or salt
+                result[k] = '[set]'
+            else:
+                result[k] = m[keys.index(k)]
         return result
     
     def updateMember(self, user, ip, m):
         # TODO: update all options
         '''update a member'''
-        if m['email_newsletter']=='on':
+        if m['title_show'] in ['on', 1, '1', True, 'true', 'True']:
+            m['title_show']=1
+        elif m['title_show'] in ['', 'null', 'Null', 'NULL', None]:
+            m['title_show'] = None
+        else:
+            m['title_show']=0
+        if m['email_newsletter'] in ['on', 1, '1', True, 'true', 'True']:
             m['email_newsletter']=1
+        elif m['email_newsletter'] in ['', 'null', 'Null', 'NULL', None]:
+            m['email_newsletter'] = None
         else:
             m['email_newsletter']=0
-        if m['email_protocols']=='on':
+        if m['email_protocols'] in ['on', 1, '1', True, 'true', 'True']:
             m['email_protocols']=1
+        elif m['email_protocols'] in ['', 'null', 'Null', 'NULL', None]:
+            m['email_protocols'] = None
         else:
             m['email_protocols']=0
-        if m['email_magazine']=='on':
+        if m['email_magazine'] in ['on', 1, '1', True, 'true', 'True']:
             m['email_magazine']=1
+        elif m['email_magazine'] in ['', 'null', 'Null', 'NULL', None]:
+            m['email_magazine'] = None
         else:
             m['email_magazine']=0
-        if m['privacy_accepted']=='on':
+        if m['privacy_accepted'] in ['on', 1, '1', True, 'true', 'True']:
             m['privacy_accepted']=1
+        elif m['privacy_accepted'] in ['', 'null', 'Null', 'NULL', None]:
+            m['privacy_accepted'] = None
         else:
             m['privacy_accepted']=0
-        if m['allow_address_internal']=='on':
+        if m['allow_address_internal'] in ['on', 1, '1', True, 'true', 'True']:
             m['allow_address_internal']=1
+        elif m['allow_address_internal'] in ['', 'null', 'Null', 'NULL', None]:
+            m['allow_address_internal'] = None
         else:
             m['allow_address_internal']=0
         cursor = self._connection.cursor()
@@ -173,16 +193,15 @@ class MbDb:
         mOld = cursor.fetchone()
         cursor.execute(sqlTemplate, (m['mid'],self.getMidFromMail(user),ip,address,email,payment,str(old),str(new)))
         # update:
-        sqlTemplate = '''UPDATE members SET title = ?, call_name = ?, 
-                street=?, street_number=?, appartment=?, postal_code=?, city=?, 
-                email_newsletter=?, email_protocols=?, email_magazine=?, 
-                privacy_accepted=?, allow_address_internal=?, geo_lat=?, geo_lon=?
-                WHERE mid=?'''
-        cursor.execute(sqlTemplate, (m['title'], m['call_name'], m['street'], m['street_number'], 
-                m['appartment'], m['postal_code'], m['city'], 
-                m['email_newsletter'], m['email_protocols'], m['email_magazine'], 
-                m['privacy_accepted'], m['allow_address_internal'], m['geo_lat'], m['geo_lon'], 
-                m['mid']))
+        sqlTemplate = 'UPDATE members SET '
+        values = ()
+        for key in new:
+            if key not in ['pwsalt', 'pwhash']:
+                sqlTemplate += key+'=?, '
+        sqlTemplate = sqlTemplate[:-2]
+        sqlTemplate += ' WHERE mid=?'
+        values.append(m['mid'])
+        cursor.execute(sqlTemplate, values)
         if len(m['password'])>=10:
             salt = uuid.uuid4().hex
             hashed_password = hashlib.sha512(m['password'].encode('utf-8') + salt.encode('utf-8')).hexdigest()
@@ -191,6 +210,10 @@ class MbDb:
         # TODO: add log entry
         self._connection.commit()
         return('ok')
+    
+    def updateMemberFull(self, user, ip, m):
+        '''updates all information of a member'''
+        return 'TODO: Management-updates noch nicht implementiert!'
     
     def getMidFromMail(self, email):
         '''returns a member-id to an eMail-address'''

@@ -225,17 +225,33 @@ def member(mid):
             privacy_declaration=privDec, geoJson=geoJson)
 
 @MemberBase.route('/member', methods=['POST'])
+@flask_login.login_required
 def memberNew():
     # TODO
     '''create a new member'''
     pass
 
 @MemberBase.route('/member/<mid>', methods=['PUT'])
+@flask_login.login_required
 def memberUpdate(mid):
     '''update a member'''
+    if flask_login.current_user.is_anonymous:
+        return render_template("error.html", relroot="./", title='403: not allowed', text=""), 403
     m = request.json
     db = dbio.MbDb(dbfile)
     result = db.updateMember(flask_login.current_user.id, request.remote_addr, m)
+    return result
+
+@MemberBase.route('/memberAdmin/<mid>', methods=['PUT'])
+@flask_login.login_required
+def memberUpdateAdmin(mid):
+    '''update a member'''
+    user = flask_login.current_user.id
+    db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return render_template("error.html", relroot="./", title='403: not allowed', text=""), 403
+    m = request.json
+    result = db.updateMemberFull(flask_login.current_user.id, request.remote_addr, m)
     return result
 
 @MemberBase.route('/_csvImport', methods=['GET'])

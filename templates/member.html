@@ -203,7 +203,7 @@
                 body: JSON.stringify(formJson)
             });
             response.text().then(function (text) {
-                if (text='ok') pa.message('Erfolgreich gespeichert!');
+                if (text=='ok') pa.message('Erfolgreich gespeichert!');
                 else pa.warning(text);
             });
         } catch(err) {
