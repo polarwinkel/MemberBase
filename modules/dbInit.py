@@ -16,7 +16,11 @@ def checkTables(db):
             given_name VARCHAR(64) NOT NULL,
             date_of_birth DATE NOT NULL,
             birth_name VARCHAR(64),
+            confession VARCHAR(64),
             title VARCHAR(64),
+            title_show BOOLEAN,
+            qualification VARCHAR(128),
+            profession VARCHAR(128),
             call_name VARCHAR(64),
             sex CHAR,
             street VARCHAR(64),
@@ -29,6 +33,15 @@ def checkTables(db):
             geo_lat VARCHAR(16),
             geo_lon VARCHAR(16),
             email VARCHAR(64),
+            parents_family_name VARCHAR(64),
+            parents_given_name VARCHAR(64),
+            parents_street VARCHAR(64),
+            parents_street_number VARCHAR(8),
+            parents_appartment VARCHAR(64),
+            parents_postal_code VARCHAR(8),
+            parents_city VARCHAR(64),
+            parents_state VARCHAR(64),
+            parents_country VARCHAR(2),
             secret VARCHAR(64),
             pwsalt VARCHAR(64),
             pwhash VARCHAR(256),
@@ -56,6 +69,28 @@ def checkTables(db):
         args.append('Failed to create members table')
         err.args = tuple(args)
         raise
+    # add colums added later; uncomment this some day!
+    newColumns = [
+            'confession VARCHAR(64)',
+            'title_show BOOLEAN',
+            'qualification VARCHAR(128)',
+            'profession VARCHAR(128)',
+            'parents_family_name VARCHAR(64)',
+            'parents_given_name VARCHAR(64)',
+            'parents_street VARCHAR(64)',
+            'parents_street_number VARCHAR(8)',
+            'parents_appartment VARCHAR(64)',
+            'parents_postal_code VARCHAR(8)',
+            'parents_city VARCHAR(64)',
+            'parents_state VARCHAR(64)',
+            'parents_country VARCHAR(2)',
+        ]
+    for col in newColumns:
+        sql_command = 'ALTER TABLE members ADD COLUMN '+col+';'
+        try:
+            cursor.execute(sql_command)
+        except sqlite3.OperationalError as err:
+            print(str(err)) # obviously the column is existing already
     
     sql_command = '''
         CREATE TABLE IF NOT EXISTS groups (

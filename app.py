@@ -187,7 +187,7 @@ def manageMember(mid):
     db = dbio.MbDb(dbfile)
     if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
         return '405 not allowed'
-    member = db.getMember(mid)
+    member = db.getMemberFull(mid)
     mJson = json.dumps(member, indent=2)
     return render_template('manageMember.html', relroot='../', authuser=flask_login.current_user.id, mJson=mJson)
 
@@ -202,10 +202,10 @@ def member(mid):
         return 404
     elif len(mid)==19 or len(mid)==29:
         print(member['mid'])
-        return redirect('/member/'+member['mid'])
+        return redirect('./'+member['mid'])
     if flask_login.current_user.is_anonymous or flask_login.current_user.id == None:
         if db.checkPasswdSet(mid):
-            return redirect('/')
+            return redirect('../')
         else:
             user = '[private URL]'
     else:

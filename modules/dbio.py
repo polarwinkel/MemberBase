@@ -110,6 +110,21 @@ class MbDb:
                 }
         return result
     
+    def getMemberFull(self, mid):
+        '''returns all information of a member'''
+        cursor = self._connection.cursor()
+        sqlTemplate = '''SELECT * FROM members WHERE mid LIKE ?'''
+        cursor.execute(sqlTemplate, (mid+'%', ))
+        m = cursor.fetchone()
+        self._connection.commit()
+        if m is None:
+            return None
+        result = {}
+        keys = list(map(lambda x: x[0], cursor.description))
+        for k in keys:
+            result[k] = m[keys.index(k)]
+        return result
+    
     def updateMember(self, user, ip, m):
         # TODO: update all options
         '''update a member'''
