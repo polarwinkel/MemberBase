@@ -64,50 +64,17 @@ class MbDb:
     def getMember(self, mid):
         '''returns most information of a member'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT mid, family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,privacy_accepted,allow_address_internal,note_public,note_manager,last_update
+        sqlTemplate = '''SELECT mid, family_name,given_name,date_of_birth,birth_name,title,title_show,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,privacy_accepted,allow_address_internal,note_public,note_manager,last_update
                 FROM members WHERE mid LIKE ?'''
         cursor.execute(sqlTemplate, (mid+'%', ))
         m = cursor.fetchone()
         self._connection.commit()
         if m is None:
             return None
-        result = {
-                'mid'                   : m[0],
-                'family_name'           : m[1],
-                'given_name'            : m[2],
-                'date_of_birth'         : m[3],
-                'birth_name'            : m[4],
-                'title'                 : m[5],
-                'call_name'             : m[6],
-                'sex'                   : m[7],
-                'street'                : m[8],
-                'street_number'         : m[9],
-                'appartment'            : m[10],
-                'postal_code'           : m[11],
-                'city'                  : m[12],
-                'state'                 : m[13],
-                'country'               : m[14],
-                'geo_lat'               : m[15],
-                'geo_lon'               : m[16],
-                'email'                 : m[17],
-                'phone'                 : m[18],
-                'mobile'                : m[19],
-                'iban'                  : m[20],
-                'bic'                   : m[21],
-                'join_date'             : m[22],
-                'status'                : m[23],
-                'privacy_accepted'      : m[24],
-                'allow_debit'           : m[25],
-                'email_newsletter'      : m[26],
-                'email_protocols'       : m[27],
-                'email_magazine'        : m[28],
-                'allow_images_public'   : m[29],
-                'privacy_accepted'      : m[30],
-                'allow_address_internal': m[31],
-                'note_public'           : m[32],
-                'note_manager'          : m[33],
-                'last_update'           : m[34]
-                }
+        result = {}
+        keys = list(map(lambda x: x[0], cursor.description))
+        for k in keys:
+            result[k] = m[keys.index(k)]
         return result
     
     def getMemberFull(self, mid):
@@ -129,9 +96,8 @@ class MbDb:
                 result[k] = m[keys.index(k)]
         return result
     
-    def updateMember(self, user, ip, m):
-        # TODO: update all options
-        '''update a member'''
+    def fixBooleans(self, m):
+        '''fix boolean-values to int'''
         if m['title_show'] in ['on', 1, '1', True, 'true', 'True']:
             m['title_show']=1
         elif m['title_show'] in ['', 'null', 'Null', 'NULL', None]:
@@ -168,52 +134,78 @@ class MbDb:
             m['allow_address_internal'] = None
         else:
             m['allow_address_internal']=0
-        cursor = self._connection.cursor()
-        # log:
-        mOld = self.getMember(m['mid'])
-        old = {}
-        new = {}
-        for key in m:
-            if key in mOld.keys() and mOld[key] != m[key]:
-                old[key] = mOld[key]
-                new[key] = m[key]
+        return m
+    
+    def log(self, user, ip, mNew):
+        '''log changes'''
+        mOld = self.getMember(mNew['mid'])
+        lOld = {}
+        lNew = {}
+        for key in mNew:
+            if (key in mOld.keys()) and mOld[key] != mNew[key] and key not in ['password', 'pwsalt', 'pwhash', 'last_update']:
+                lOld[key] = mOld[key]
+                lNew[key] = mNew[key]
+            if key=='password' and len(mNew['password'])>=10:
+                if mOld['pwhash'] == None:
+                    lOld['password'] = 'null'
+                else:
+                    lOld['password'] = '[set]'
+                lNew['password'] = '[new password]'
         address = 0
         email = 0
         payment = 0
-        for key in new:
+        for key in lNew:
             if key in ['family_name','given_name','title','street','street_number','appartment','postal_code','city','state','country']:
                 address = 1
             if key == 'email':
                 email = 1
             if key in ['iban','bic','allow_debit']:
                 payment = 1
+        cursor = self._connection.cursor()
         sqlTemplate = '''INSERT INTO log 
                 (timestamp,changed_mid,user_mid,remote_ip,address,email,payment,old_data,new_data)
                 VALUES (CURRENT_TIMESTAMP,?,?,?,?,?,?,?,?)'''
-        mOld = cursor.fetchone()
-        cursor.execute(sqlTemplate, (m['mid'],self.getMidFromMail(user),ip,address,email,payment,str(old),str(new)))
+        cursor.execute(sqlTemplate, (mNew['mid'],self.getMidFromMail(user),ip,address,email,payment,str(lOld),str(lNew)))
+    
+    def updateMember(self, user, ip, m):
+        '''update basic data of a member'''
+        m = self.fixBooleans(m)
+        self.log(user, ip, m)
         # update:
-        sqlTemplate = 'UPDATE members SET '
-        values = ()
-        for key in new:
-            if key not in ['pwsalt', 'pwhash']:
-                sqlTemplate += key+'=?, '
-        sqlTemplate = sqlTemplate[:-2]
-        sqlTemplate += ' WHERE mid=?'
-        values.append(m['mid'])
-        cursor.execute(sqlTemplate, values)
+        cursor = self._connection.cursor()
+        sqlTemplate = '''UPDATE members SET title=?, title_show=?, call_name=?, 
+                street=?, street_number=?, appartment=?, postal_code=?, city=?, 
+                email_newsletter=?, email_protocols=?, email_magazine=?, 
+                privacy_accepted=?, allow_address_internal=?, geo_lat=?, geo_lon=?
+                WHERE mid=?'''
+        cursor.execute(sqlTemplate, (m['title'], m['title_show'], m['call_name'], m['street'], m['street_number'], 
+                m['appartment'], m['postal_code'], m['city'], 
+                m['email_newsletter'], m['email_protocols'], m['email_magazine'], 
+                m['privacy_accepted'], m['allow_address_internal'], m['geo_lat'], m['geo_lon'], 
+                m['mid']))
         if len(m['password'])>=10:
             salt = uuid.uuid4().hex
             hashed_password = hashlib.sha512(m['password'].encode('utf-8') + salt.encode('utf-8')).hexdigest()
             sqlTemplate = '''UPDATE members SET pwsalt=?, pwhash=? WHERE mid=?'''
             cursor.execute(sqlTemplate, (salt, hashed_password, m['mid']))
-        # TODO: add log entry
         self._connection.commit()
-        return('ok')
+        return 'ok'
     
     def updateMemberFull(self, user, ip, m):
-        '''updates all information of a member'''
-        return 'TODO: Management-updates noch nicht implementiert!'
+        '''updates all information of a member (for management-use only)'''
+        self.log(user, ip, m)
+        cursor = self._connection.cursor()
+        sqlTemplate = 'UPDATE members SET '
+        values = ()
+        for key in m:
+            if key not in ['mid', 'password', 'pwsalt', 'pwhash', 'last_update']:
+                sqlTemplate += key+'=?, '
+                values = values + (m[key],)
+        sqlTemplate = sqlTemplate[:-2]+' WHERE mid=?'
+        values = values + (m['mid'],)
+        cursor.execute(sqlTemplate, values)
+        self._connection.commit()
+        return 'ok'
     
     def getMidFromMail(self, email):
         '''returns a member-id to an eMail-address'''

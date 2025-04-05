@@ -13,6 +13,8 @@
     <input type="text" class="formdata" name="call_name" id="call_name"><br>
     <label for="title">Titel:</label>
     <input type="text" class="formdata" name="title" id="title"><br>
+    <label for="title_show">Titel verwenden:</label>
+    <input type="checkbox" class="formdata" name="title_show" id="title_show"><br>
     <h2>Adresse:</h2>
     <label for="street">Straße:</label>
     <input type="text" class="formdata" name="street" id="street"><br>
@@ -106,6 +108,7 @@
         document.getElementById('mid').value = m.mid;
         document.getElementById('name').innerHTML = m.title+' '+m.given_name+' '+m.family_name;
         document.getElementById('title').value = m.title;
+        document.getElementById('title_show').checked = m.title_show;
         document.getElementById('street').value = m.street;
         document.getElementById('street_number').value = m.street_number;
         document.getElementById('appartment').value = m.appartment;

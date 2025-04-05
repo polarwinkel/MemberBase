@@ -9,8 +9,8 @@
 </nav>
 <div id="content">
     <h1>Mitglied verwalten</h1>
-    <p><b>Warnung:</b> Nur die Felder bearbeiten von denen du weißt was sie tun!</p>
-    <p><b>Warnung:</b> Boolean-Felder (Ja-Nein-Felder) müssen "1" (="Ja"), "0" (="Nein") oder "null" (="unbekannt") enthalten!</p>
+    <p><b>Warnung:</b> Nur die Felder bearbeiten von denen du <i>wirklich</i> weißt was drin stehen soll! Einstellungen hier werden ohne Überprüfung übernommen!</p>
+    <p><b>Warnung:</b> Boolean-Felder (Ja-Nein-Felder) müssen <code>1</code> (="Ja"), <code>0</code> (="Nein") oder <code>null</code> (="unbekannt") enthalten!</p>
     <div id="data"></div>
     <button id="submit" onclick="submit()">Änderungen speichern</button>
 </div>
@@ -27,7 +27,7 @@
             out += '<tr><td>'+key+'</td>';
             out += '<td>';
             out += '<input type="text" class="formdata" name="'+key+'" id="'+key+'" ';
-            if (key=='mid' || key=='pwsalt' || key=='pwhash') {
+            if (key=='mid' || key=='pwsalt' || key=='pwhash' || key=='last_update') {
                 out += 'value="'+m[key]+'" disabled>';
             } else {
                 out += 'value="'+m[key]+'">';
@@ -52,7 +52,7 @@
             });
             response.text().then(function (text) {
                 if (text=='ok' && response.status==200) pa.message('Erfolgreich gespeichert!');
-                else pa.warning(text);
+                else pa.error(text);
             });
         } catch(err) {
             alert(err);
