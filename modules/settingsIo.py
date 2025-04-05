@@ -42,7 +42,7 @@ class settingsIo:
         elif key=='magazine_name':
             return self.s['magazine_name']
         elif key=='privacy_declaration':
-            return self.s['privacy_declaration']
+            return self.s['privacy_declaration'].strip()
         elif key=='admin':
             return self.s['admin']
         elif key=='secret_key':
@@ -65,7 +65,7 @@ class settingsIo:
             self.s['salt'] = salt
             self.s['password'] = hashed_password
         else:
-            self.s[key] = value
+            self.s[key] = value.strip()
         with open(self.sfile, 'w') as f:
             yaml.dump(self.s, f)
         with open(self.sfile) as f:
