@@ -306,7 +306,7 @@ def csvImportPost():
                 return 'ERROR: Wrong title line, please read CAREFULLY what to do here and what can go wrong!'
             linecount += 1
             continue
-        db_res = db.addMember(family_name=row[0],given_name=row[1],date_of_birth=row[2],place_of_birth[3],birth_name=row[4],title=row[5],call_name=row[6],sex=row[7],street=row[8],street_number=row[9],appartment=row[10],postal_code=row[11],city=row[12],state=row[13],country=row[14],email=row[15],phone=row[16],mobile=row[17],iban=row[18],bic=row[19],join_date=row[20],status=row[21],note_public=row[22],note_manager=row[23])
+        db_res = db.addMember(family_name=row[0],given_name=row[1],date_of_birth=row[2],place_of_birth=row[3],birth_name=row[4],title=row[5],call_name=row[6],sex=row[7],street=row[8],street_number=row[9],appartment=row[10],postal_code=row[11],city=row[12],state=row[13],country=row[14],email=row[15],phone=row[16],mobile=row[17],iban=row[18],bic=row[19],join_date=row[20],status=row[21],note_public=row[22],note_manager=row[23])
         if db_res != False:
             importcount += 1
         linecount += 1
