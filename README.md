@@ -3,6 +3,18 @@
 # MemberBase
 Online Mitglieder-Datenbank und Mitgliederverwaltung für Vereine
 
-## work in progress...!
+## Beta-Status
 
-Diese Software ist ~noch nicht für den Produktiveinsatz geeignet~ im __Alpha-Stadium__. Einige wichtige Features fehlen noch, sie wird aber von mir schon produktiv eingesetzt, ein stabiler Upgrade-Pfad wird angestrebt, jedoch nicht garantiert.
+Diese Software ist ~noch nicht für den Produktiveinsatz geeignet~ im __Beta-Stadium__.
+Alle wirklich wichtigen Features sind implementiert werden im Produktivbetrieb getestet.
+
+## Installation
+
+Auf einem Debian(-basierten) System kann als `root` die `install.sh`-Datei ausgeführt werden:
+Mit `sudo chmod +x install.sh` ausführbar machen, dann mit `./install.sh` ausführen.
+
+Umdates werden genauso installiert.
+
+MemberBase läuft dann als system-Service und ist im Browser des Servers unter `localhost:4208` aufrufbar.
+
+Für externen Zugriff ist ein ReverseProxy wie z.B. `nginx` zu installieren, der sinnvollerweise auch die Verschlüsselung übernimmt.

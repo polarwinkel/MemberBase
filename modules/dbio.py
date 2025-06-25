@@ -262,12 +262,15 @@ class MbDb:
                 })
         return result
     
-    def getMembers(self, state, gid=''):
+    def getMembers(self, status=None, gid=''):
         '''returns a list of all members with certain state [or with certain group]'''
         cursor = self._connection.cursor()
-        if gid=='':
+        if status==None:
+            sqlTemplate = '''SELECT mid, family_name, given_name, date_of_birth FROM members'''
+            cursor.execute(sqlTemplate)
+        elif gid=='':
             sqlTemplate = '''SELECT mid, family_name, given_name, date_of_birth FROM members WHERE status=?'''
-            cursor.execute(sqlTemplate, (state, ))
+            cursor.execute(sqlTemplate, (status, ))
         else:
             sqlTemplate = '''SELECT members.mid, members.family_name, members.given_name, members.date_of_birth 
                     FROM members JOIN group_members ON members.mid=group_members.mid
@@ -433,14 +436,28 @@ class MbDb:
             sqlTemplate = '''SELECT 
                     timestamp, changed_mid, user_mid, family_name, given_name, 
                     remote_ip, old_data, new_data 
-                    FROM log JOIN members ON log.changed_mid=members.mid
+                    FROM log LEFT OUTER JOIN members ON log.changed_mid=members.mid
                     ORDER BY timestamp DESC LIMIT 1000'''
         elif dataset=='address':
             sqlTemplate = '''SELECT 
                     timestamp, changed_mid, user_mid, family_name, given_name,
                     remote_ip, old_data, new_data 
-                    FROM log JOIN members ON log.changed_mid=members.mid
+                    FROM log LEFT OUTER JOIN members ON log.changed_mid=members.mid
                     WHERE log.address == 1
+                    ORDER BY timestamp DESC LIMIT 1000'''
+        elif dataset=='email':
+            sqlTemplate = '''SELECT 
+                    timestamp, changed_mid, user_mid, family_name, given_name,
+                    remote_ip, old_data, new_data 
+                    FROM log LEFT OUTER JOIN members ON log.changed_mid=members.mid
+                    WHERE log.email == 1
+                    ORDER BY timestamp DESC LIMIT 1000'''
+        elif dataset=='payment':
+            sqlTemplate = '''SELECT 
+                    timestamp, changed_mid, user_mid, family_name, given_name,
+                    remote_ip, old_data, new_data 
+                    FROM log LEFT OUTER JOIN members ON log.changed_mid=members.mid
+                    WHERE log.payment == 1
                     ORDER BY timestamp DESC LIMIT 1000'''
         cursor.execute(sqlTemplate, )
         tup = cursor.fetchall()
@@ -459,12 +476,31 @@ class MbDb:
                 })
         return log
     
-    def deleteMember(self, mid):
+    def deleteMember(self, user, ip, mid):
         '''delete a member'''
+        mOld = self.getMember(mid)
         cursor = self._connection.cursor()
         sqlTemplate = '''DELETE FROM group_members WHERE mid=?;'''
-        cursor.execute(sqlTemplate, (mid))
+        cursor.execute(sqlTemplate, (mid, ))
         sqlTemplate = '''DELETE FROM members WHERE mid=?;'''
-        cursor.execute(sqlTemplate, (mid))
+        cursor.execute(sqlTemplate, (mid, ))
+        sqlTemplate = '''DELETE FROM log WHERE changed_mid=?;'''
+        cursor.execute(sqlTemplate, (mid, ))
         self._connection.commit()
+        # log:
+        old={'family_name':mOld['family_name'],'given_name':mOld['given_name'],'date_of_birth':mOld['date_of_birth']}
+        address = 1
+        try:
+            if mOld['email'] == 1:
+                email = 1
+            else: email=0
+        except TypeError:
+            email=0
+        payment = 1
+        sqlTemplate = '''INSERT INTO log 
+                (timestamp,changed_mid,user_mid,remote_ip,address,email,payment,old_data,new_data)
+                VALUES (CURRENT_TIMESTAMP,?,?,?,?,?,?,?,?)'''
+        cursor.execute(sqlTemplate, (mid,self.getMidFromMail(user),ip,address,email,payment,str(old),'DELETED'))
+        self._connection.commit()
+        return 'ok'
     

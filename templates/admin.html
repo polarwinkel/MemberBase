@@ -7,6 +7,14 @@
 <div id="content">
     <h1>MemberBase admin</h1>
     <p><a href="_logout">logout</a></p>
+    <hr>
+    <p><a href="{{ relroot }}manage">Management</a></p>
+    <p><a href="{{ relroot }}log/all">log</a></p>
+    <p><a href="{{ relroot }}_csvImport">csvImport</a></p>
+    <hr>
+    <h2>Alle Gruppen</h2>
+    <div id="grouplist"></div>
+    <hr>
     <h2>Admin-Einstellungen</h2>
     <h3>System</h3>
     <label for="dbfile">Datenbank-Datei:</label>
@@ -29,13 +37,6 @@
     <label for="privacy_declaration">Datenschutz-Erklärung:</label>
     <textarea type="text" class="formdata" name="privacy_declaration" id="privacy_declaration">{{ privacy_declaration }}</textarea><br>
     <button id="submit" onclick="submit()">Änderungen speichern</button>
-    <hr>
-    <p><a href="{{ relroot }}manage">Management</a></p>
-    <p><a href="{{ relroot }}log/all">log</a></p>
-    <p><a href="{{ relroot }}_csvImport">csvImport</a></p>
-    <hr>
-    <h2>Alle Gruppen</h2>
-    <div id="grouplist"></div>
     <hr>
     <!--<h2>Alle Mitglieder</h2>
     <div id="memberlist"></div>-->

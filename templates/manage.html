@@ -8,12 +8,17 @@
     <h1>MemberBase Management</h1>
     <p><a href="_logout">logout</a></p>
     <hr>
+    <h2>Neues Mitglied</h2>
+    <p><a href="{{ relroot }}addMember">neues Mitglied aufnehmen</a></p>
+    <hr>
     <h2>Mitgliederlisten nach Status</h2>
     <ul id="statesList"></ul>
     <hr>
     <h2>Änderungs-Protokoll</h2>
     <ul>
         <li><a href="{{ relroot }}log/address">Adress-Änderungen</a></li>
+        <li><a href="{{ relroot }}log/email">eMail-Änderungen</a></li>
+        <li><a href="{{ relroot }}log/payment">Zahlungs-Änderungen</a></li>
     </ul>
     <p>TODO: Änderungs-Protokoll für eMail-Adressen muss noch implementiert werden. Ggf. wird noch eine bessere Ansicht für Adressänderungen implementiert.</p>
 </div>
@@ -23,7 +28,6 @@
 
 <script>
     var states = JSON.parse({{ statesJson|tojson }});
-    console.log(states);
     out = '';
     for (var i=0; i<states.length; i++){
         out += '<li>';

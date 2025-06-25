@@ -13,6 +13,8 @@
     <p><b>Warnung:</b> Boolean-Felder (Ja-Nein-Felder) müssen <code>1</code> (="Ja"), <code>0</code> (="Nein") oder <code>null</code> (="unbekannt") enthalten!</p>
     <div id="data"></div>
     <button id="submit" onclick="submit()">Änderungen speichern</button>
+    <hr>
+    <button onclick="delete(pa.input('Das ist unwiderbringlich! Wirklich löschen?<br>Dann tippe <code>DELETE</code> ein!'))" style="color:red;">Mitglied löschen</button>
 </div>
 
 <script src="{{ relroot }}_static/getFormJson.js"></script>
@@ -69,6 +71,25 @@
             });
         } catch(err) {
             alert(err);
+        }
+    }
+    // Delete:
+    async function paInputReceive(inputtext) {
+        if (inputtext == 'DELETE') {
+            var deleteUrl = relroot+'_deleteMember/'+m.mid;
+            try{
+                const response = await fetch(deleteUrl, {
+                    method: 'DELETE',
+                });
+                response.text().then(function (text) {
+                    if (text=='ok' && response.status==200) pa.message('Erfolgreich gelöscht!');
+                    else pa.error(text);
+                });
+            } catch(err) {
+                alert(err);
+            }
+        } else {
+            alert('Ok, nichts passiert.');
         }
     }
 </script>

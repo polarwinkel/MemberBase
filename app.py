@@ -188,7 +188,6 @@ def manageList(state):
     if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
         return '405 not allowed'
     members = db.getMembers(state)
-    print(members)
     msJson = json.dumps(members, indent=2)
     return render_template('manageList.html', relroot='../', authuser=flask_login.current_user.id, msJson=msJson, magazine_name=settings.get('magazine_name'), state=state)
 
@@ -214,7 +213,6 @@ def member(mid):
     if member == None:
         return 404
     elif len(mid)==19 or len(mid)==29:
-        print(member['mid'])
         return redirect('./'+member['mid'])
     if flask_login.current_user.is_anonymous or flask_login.current_user.id == None:
         if db.checkPasswdSet(mid):
@@ -237,12 +235,27 @@ def member(mid):
             mJson=mJson, gJson=gJson, magazine_name=settings.get('magazine_name'),
             privacy_declaration=privDec, geoJson=geoJson)
 
-@MemberBase.route('/member', methods=['POST'])
+@MemberBase.route('/addMember', methods=['GET'])
 @flask_login.login_required
-def memberNew():
-    # TODO
+def addMember():
+    '''page to create a new member'''
+    user = flask_login.current_user.id
+    db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return render_template("error.html", relroot="./", title='403: not allowed', text=""), 403
+    return render_template("addMember.html", relroot="./", authuser=flask_login.current_user.id, states=json.dumps(settings.get('states')))
+
+@MemberBase.route('/addMember', methods=['PUT'])
+@flask_login.login_required
+def addMemberPut():
     '''create a new member'''
-    pass
+    user = flask_login.current_user.id
+    db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return render_template("error.html", relroot="./", title='403: not allowed', text=""), 403
+    m = request.json
+    mid = db.addMember(family_name=m['family_name'],given_name=m['given_name'],date_of_birth=m['date_of_birth'])
+    return(mid)    
 
 @MemberBase.route('/member/<mid>', methods=['PUT'])
 @flask_login.login_required
@@ -309,7 +322,7 @@ def group(gid):
     if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
         return '405 not allowed'
     gname = db.getGroupName(gid)
-    gmembers = db.getMembers(gid)
+    gmembers = db.getMembers(status='', gid=gid)
     gNmembers = db.getNotMembers(gid)
     gmJson = json.dumps(gmembers, indent=2)
     gnmJson = json.dumps(gNmembers, indent=2)
@@ -337,7 +350,7 @@ def log(dataset = ''):
         return '405 not allowed'
     log = db.getLog(dataset)
     logJson = json.dumps(log, indent=2)
-    return render_template('log.html', relroot='../', authuser=flask_login.current_user.id, logJson=logJson)
+    return render_template('log.html', relroot='../', authuser=flask_login.current_user.id, logJson=logJson, dataset=dataset)
 
 @MemberBase.route('/csvExport/<selection>', methods=['GET'])
 @flask_login.login_required
@@ -366,13 +379,14 @@ def csvExport(selection):
             mimetype='text/csv',
             )
 
-@MemberBase.route('/_delete/<did>', methods=['DELETE'])
+@MemberBase.route('/_deleteMember/<mid>', methods=['DELETE'])
 @flask_login.login_required
-def delete(wid):
+def deleteMember(mid):
     # TODO
-    '''delete data'''
-    #db = dbio.PwDb(dbfile)
-    return 'TODO'
+    '''delete member'''
+    db = dbio.MbDb(dbfile)
+    res = db.deleteMember(flask_login.current_user.id, request.remote_addr, mid)
+    return res
 
 # run it:
 

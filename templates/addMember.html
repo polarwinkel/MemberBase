@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+            <p id="nav" class="no-print" style="width:100%; background-color:080; text-align:right;">
+                &nbsp;
+            </p>
+<nav id="pagenav">
+    <p>Logged in as: {{ authuser }} | <a href="{{ relroot }}_logout">Logout</a></p>
+</nav>
+<div id="content">
+    <h1>Neues Mitglied anlegen</h1>
+    <p>Nach dem Anlegen mit Nachname, Vorname und Geburtsdatum können die weiteren Daten eingegeben werden.</p>
+    <div id="data">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Nachname</td>
+                    <td><input type="text" class="formdata" name="family_name" id="family_name" required></td>
+                </tr><tr>
+                    <td>Vorname</td>
+                    <td><input type="text" class="formdata" name="given_name" id="given_name" required></td>
+                </tr><tr>
+                    <td>Geburtsdatum</td>
+                    <td><input type="date" class="formdata" name="date_of_birth" id="date_of_birth" required></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <button id="submit" onclick="submit()">Speichern und Details bearbeiten</button>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+<script>
+    var relroot = '{{ relroot }}';
+    var states = JSON.parse({{ states|tojson }});
+    
+    async function submit() {
+        // send form to server
+        var formJson = getFormJson();
+        var putUrl = relroot+'addMember';
+        try{
+            const response = await fetch(putUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formJson)
+            });
+            response.text().then(function (text) {
+                //if (text=='ok' && response.status==200) pa.message('Erfolgreich gespeichert!');
+                //else pa.error(text);
+                window.location.replace('{{ relroot }}manage/'+text);
+            });
+        } catch(err) {
+            alert(err);
+        }
+    }
+</script>
+
+{% endblock %}
