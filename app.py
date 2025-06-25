@@ -179,17 +179,17 @@ def manage():
     statesJson = json.dumps(states)
     return render_template('manage.html', relroot='./', authuser=flask_login.current_user.id, statesJson=statesJson)
 
-@MemberBase.route('/manageList/<state>', methods=['GET'])
+@MemberBase.route('/manageList/<status>', methods=['GET'])
 @flask_login.login_required
-def manageList(state):
+def manageList(status):
     '''show member-lists for management according to state'''
     user = flask_login.current_user.id
     db = dbio.MbDb(dbfile)
     if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
         return '405 not allowed'
-    members = db.getMembers(state)
+    members = db.getMembers(status)
     msJson = json.dumps(members, indent=2)
-    return render_template('manageList.html', relroot='../', authuser=flask_login.current_user.id, msJson=msJson, magazine_name=settings.get('magazine_name'), state=state)
+    return render_template('manageList.html', relroot='../', authuser=flask_login.current_user.id, msJson=msJson, magazine_name=settings.get('magazine_name'), status=status)
 
 @MemberBase.route('/manage/<mid>', methods=['GET'])
 @flask_login.login_required
@@ -352,9 +352,9 @@ def log(dataset = ''):
     logJson = json.dumps(log, indent=2)
     return render_template('log.html', relroot='../', authuser=flask_login.current_user.id, logJson=logJson, dataset=dataset)
 
-@MemberBase.route('/csvExport/<selection>', methods=['GET'])
+@MemberBase.route('/csvExport/<status>/<selection>', methods=['GET'])
 @flask_login.login_required
-def csvExport(selection):
+def csvExport(status, selection):
     '''exports members as csvfile according to the selection'''
     user = flask_login.current_user.id
     db = dbio.MbDb(dbfile)
@@ -362,11 +362,9 @@ def csvExport(selection):
         return '405 not allowed'
     sel = selection.split('_')
     if sel[0] == 'mail':
-        csvfile = db.csvExportMail(sel[1])
+        csvfile = db.csvExportMail(status, sel[1])
     elif sel[0] == 'addr':
-        csvfile = db.csvExportAddr(sel[1])
-    elif sel[0] == 'addr':
-        csvfile = db.csvExportAddr(sel[1])
+        csvfile = db.csvExportAddr(status, sel[1])
     else:
         return '404 not found'
     mem = io.BytesIO()

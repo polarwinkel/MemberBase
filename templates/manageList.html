@@ -5,29 +5,31 @@
     &nbsp;
 </p>
 <div id="content">
-    <h1>MemberBase Management: Listen</h1>
+    <h1>MemberBase Management: Listen {{ status }}</h1>
     <p><a href="_logout">logout</a></p>
     <hr>
     <h2>csv-Exporte</h2>
-    <p>TODO: Nach Status filtern (bislang: komplette Liste)!</p>
-    <h3>eMail-Verteiler</h3>
+    <h3>eMail-Verteiler für</h3>
     <ul>
-        <li><a href="{{ relroot }}csvExport/mail_n">Mailverteiler</a></li>
-        <li><a href="{{ relroot }}csvExport/mail_p">Protokoll</a></li>
-        <li><a href="{{ relroot }}csvExport/mail_m">{{ magazine_name }}</a></li>
+        <li><a href="{{ relroot }}csvExport/{{ status }}/mail_n">Mailverteiler</a></li>
+        <li><a href="{{ relroot }}csvExport/{{ status }}/mail_p">Protokoll</a></li>
+        <li><a href="{{ relroot }}csvExport/{{ status }}/mail_m">{{ magazine_name }}</a></li>
+        <li><a href="{{ relroot }}csvExport/{{ status }}/mail_pm">Ptotokolle und {{ magazine_name }}</a></li>
     </ul>
-    <h3>Adress-Verteiler</h3>
+    <h3>Adress-Verteiler für</h3>
     <ul>
-        <li><a href="{{ relroot }}csvExport/addr_p">Protokolle</a></li>
-        <li><a href="{{ relroot }}csvExport/addr_m">{{ magazine_name }}</a></li>
-        <li><a href="{{ relroot }}csvExport/addr_pm">Protokolle und {{ magazine_name }}</a></li>
+        <li><a href="{{ relroot }}csvExport/{{ status }}/addr_p">Protokolle</a></li>
+        <li><a href="{{ relroot }}csvExport/{{ status }}/addr_m">{{ magazine_name }}</a></li>
+        <li><a href="{{ relroot }}csvExport/{{ status }}/addr_pm">Protokolle und {{ magazine_name }}</a></li>
     </ul>
-    <h3>Änderungen</h3>
+    <h2>Änderungen</h2>
     <ul>
         <li><a href="{{ relroot }}log/address">Adress-Änderungen</a></li>
+        <li><a href="{{ relroot }}log/email">eMail-Änderungen</a></li>
+        <li><a href="{{ relroot }}log/payment">Zahlungs-Änderungen</a></li>
     </ul>
     <hr>
-    <h2>Alle Mitglieder mit Status "{{ state }}"</h2>
+    <h2>Alle Mitglieder mit Status "{{ status }}"</h2>
     <div id="memberlist"></div>
 </div>
 

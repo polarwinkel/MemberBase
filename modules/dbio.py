@@ -367,22 +367,24 @@ class MbDb:
             return False
         return True
         
-    def csvExportMail(self, sel):
+    def csvExportMail(self, status, sel):
         '''export member-list according to the selection'''
         cursor = self._connection.cursor()
         if sel == 'n':
-            where = 'WHERE email_newsletter=1'
+            where = 'WHERE (status=?) AND (email_newsletter=1)'
         if sel == 'p':
-            where = 'WHERE email_protocols=1'
+            where = 'WHERE (status=?) AND (email_protocols=1)'
         elif sel == 'm':
-            where = 'WHERE email_magazine=1'
+            where = 'WHERE (status=?) AND (email_magazine=1)'
+        elif sel == 'pm':
+            where = 'WHERE (status=?) AND (email_protocols=1 OR email_magazine=1)'
         sqlTemplate = '''SELECT family_name, given_name, title, sex, email
                 FROM members {where} ORDER BY
                 REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
                 family_name,'ä','ae'),'ö','oe'),'ü','ue'),'Ä','Ae'),'Ö','Oe'),'Ü','Ue'),'ß','ss'), 
                 REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
                 given_name,'ä','ae'),'ö','oe'),'ü','ue'),'Ä','Ae'),'Ö','Oe'),'Ü','Ue'),'ß','ss') '''.format(where=where)
-        cursor.execute(sqlTemplate)
+        cursor.execute(sqlTemplate, (status, ))
         mlist = cursor.fetchall()
         f = io.StringIO() # init-value would leave the cursor at beginning
         f.write('family_name,given_name,title,sex,email,\n')
@@ -392,22 +394,22 @@ class MbDb:
         f.seek(0) # get cursor to beginning
         return f
     
-    def csvExportAddr(self, sel):
+    def csvExportAddr(self, status, sel):
         '''export member-list according to the selection'''
         cursor = self._connection.cursor()
         if sel == 'p':
-            where = 'WHERE email_protocols=0 OR email_protocols IS NULL'
+            where = 'WHERE (status=?) AND (email_protocols=0 OR email_protocols IS NULL)'
         elif sel == 'm':
-            where = 'WHERE email_magazine=0 OR email_magazine IS NULL'
+            where = 'WHERE (status=?) AND (email_magazine=0 OR email_magazine IS NULL)'
         elif sel == 'pm':
-            where = 'WHERE email_protocols=0 OR email_protocols IS NULL OR email_magazine=0 OR email_magazine IS NULL'
+            where = 'WHERE (status=?) AND (email_protocols=0 OR email_protocols IS NULL OR email_magazine=0 OR email_magazine IS NULL)'
         sqlTemplate = '''SELECT family_name, given_name, title, sex, street, street_number, appartment, postal_code, city, country
                 FROM members {where} ORDER BY
                 REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
                 family_name,'ä','ae'),'ö','oe'),'ü','ue'),'Ä','Ae'),'Ö','Oe'),'Ü','Ue'),'ß','ss'), 
                 REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
                 given_name,'ä','ae'),'ö','oe'),'ü','ue'),'Ä','Ae'),'Ö','Oe'),'Ü','Ue'),'ß','ss') '''.format(where=where)
-        cursor.execute(sqlTemplate)
+        cursor.execute(sqlTemplate, (status, ))
         mlist = cursor.fetchall()
         f = io.StringIO()
         f.write('family_name,given_name,title,sex,street,street_number,appartment,postal_code,city,country,\n')
