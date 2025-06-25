@@ -302,11 +302,11 @@ def csvImportPost():
     importcount = 0
     for row in data:
         if linecount == 0:
-            if ','.join(row) != 'family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,status,note_public,note_manager':
+            if ','.join(row) != 'family_name,given_name,date_of_birth,place_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,status,note_public,note_manager':
                 return 'ERROR: Wrong title line, please read CAREFULLY what to do here and what can go wrong!'
             linecount += 1
             continue
-        db_res = db.addMember(family_name=row[0],given_name=row[1],date_of_birth=row[2],birth_name=row[3],title=row[4],call_name=row[5],sex=row[6],street=row[7],street_number=row[8],appartment=row[9],postal_code=row[10],city=row[11],state=row[12],country=row[13],email=row[14],phone=row[15],mobile=row[16],iban=row[17],bic=row[18],join_date=row[19],status=row[20],note_public=row[21],note_manager=row[22])
+        db_res = db.addMember(family_name=row[0],given_name=row[1],date_of_birth=row[2],place_of_birth[3],birth_name=row[4],title=row[5],call_name=row[6],sex=row[7],street=row[8],street_number=row[9],appartment=row[10],postal_code=row[11],city=row[12],state=row[13],country=row[14],email=row[15],phone=row[16],mobile=row[17],iban=row[18],bic=row[19],join_date=row[20],status=row[21],note_public=row[22],note_manager=row[23])
         if db_res != False:
             importcount += 1
         linecount += 1

@@ -40,16 +40,16 @@ class MbDb:
         mid = cursor.fetchone()
         return mid
     
-    def addMember(self, family_name,given_name,date_of_birth,birth_name='',title='',call_name='',sex='',street='',street_number='',appartment='',postal_code='',city='',state='',country='',email='',phone='',mobile='',iban='',bic='',join_date='',status='',note_public='',note_manager=''):
+    def addMember(self, family_name,given_name,date_of_birth,place_of_birth='',birth_name='',title='',call_name='',sex='',street='',street_number='',appartment='',postal_code='',city='',state='',country='',email='',phone='',mobile='',iban='',bic='',join_date='',status='',note_public='',note_manager=''):
         '''adds a new member, returning its mid (or False if exists)'''
         if self.checkMember(family_name, given_name, date_of_birth) is not None:
             return False
         mid = huuid.new()
         # TODO: check if one with first 32bit exists already
         cursor = self._connection.cursor()
-        sqlTemplate = '''INSERT INTO members (mid,family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,status,note_public,note_manager)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'''
-        cursor.execute(sqlTemplate, (mid,family_name,given_name,date_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,status,note_public,note_manager))
+        sqlTemplate = '''INSERT INTO members (mid,family_name,given_name,date_of_birth,place_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,status,note_public,note_manager)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);'''
+        cursor.execute(sqlTemplate, (mid,family_name,given_name,date_of_birth,place_of_birth,birth_name,title,call_name,sex,street,street_number,appartment,postal_code,city,state,country,email,phone,mobile,iban,bic,join_date,status,note_public,note_manager))
         self._connection.commit()
         sqlTemplate = '''SELECT mid FROM members 
                 WHERE family_name=? AND given_name=? AND date_of_birth=?'''
@@ -64,7 +64,7 @@ class MbDb:
     def getMember(self, mid):
         '''returns most information of a member'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT mid, family_name,given_name,date_of_birth,birth_name,title,title_show,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,privacy_accepted,allow_address_internal,note_public,note_manager,last_update
+        sqlTemplate = '''SELECT mid, family_name,given_name,date_of_birth,place_of_birth,birth_name,title,title_show,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,privacy_accepted,allow_address_internal,note_public,note_manager,last_update
                 FROM members WHERE mid LIKE ?'''
         cursor.execute(sqlTemplate, (mid+'%', ))
         m = cursor.fetchone()

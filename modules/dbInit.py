@@ -15,6 +15,7 @@ def checkTables(db):
             family_name VARCHAR(64) NOT NULL,
             given_name VARCHAR(64) NOT NULL,
             date_of_birth DATE NOT NULL,
+            place_of_birth VARCHAR(64),
             birth_name VARCHAR(64),
             confession VARCHAR(64),
             title VARCHAR(64),
@@ -72,7 +73,7 @@ def checkTables(db):
         raise
     # add colums added later; uncomment this some day!
     newColumns = [
-            'memberships TEXT'
+            'place_of_birth VARCHAR(64)'
         ]
     for col in newColumns:
         sql_command = 'ALTER TABLE members ADD COLUMN '+col+';'
