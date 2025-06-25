@@ -20,16 +20,29 @@
 <script>
     var relroot = '{{ relroot }}';
     var m = JSON.parse({{ mJson|tojson }});
+    var states = JSON.parse({{ states|tojson }});
     
     function showMember(){
         out = '<table><tr><th>key</th><th>value</th></tr>';
         for (var key in m) {
             out += '<tr><td>'+key+'</td>';
             out += '<td>';
-            out += '<input type="text" class="formdata" name="'+key+'" id="'+key+'" ';
             if (key=='mid' || key=='pwsalt' || key=='pwhash' || key=='last_update') {
+                out += '<input type="text" class="formdata" name="'+key+'" id="'+key+'" ';
                 out += 'value="'+m[key]+'" disabled>';
+            } else if (key=='status') {
+                out += '<select class="formdata" name="'+key+'" id="'+key+'" selected="'+m[key]+'">';
+                out += '<option></option>';
+                for (var i=0; i<states.length; i++) {
+                    if (states[i] == m[key]) {
+                        out += '<option selected="selected">'+states[i]+'</option>';
+                    } else {
+                        out += '<option>'+states[i]+'</option>';
+                    }
+                }
+                out += '</select>';
             } else {
+                out += '<input type="text" class="formdata" name="'+key+'" id="'+key+'" ';
                 out += 'value="'+m[key]+'">';
             }
             out += '</td></tr>';

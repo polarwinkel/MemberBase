@@ -22,10 +22,12 @@
     <input type="text" class="formdata" name="organame" id="organame"><br>
     <label for="magazine_name">Mitglieder-Zeitung:</label>
     <input type="text" class="formdata" name="magazine_name" id="magazine_name"><br>
+    <label for="states">Stati:</label>
+    <textarea type="text" class="formdata" name="states" id="states">{{ states }}</textarea><br>
+    <p>Hinweis: Jedes Mitglied kann <i>maximal einen Status</i> haben, z.B. "Aktiv", "Fördermitglied" o.ä.! Weitere Informationen können über Hinweise z.B. im Feld <code>note_public</code> oder <code>note_manager</code> oder ggf. zukünftig über Gruppen abgebildet werden.<br>
+    Die Stati-Namen <i>nicht</i> nachträglich ändern, allenfalls erweitern und nur leere löschen!</p>
     <label for="privacy_declaration">Datenschutz-Erklärung:</label>
-    <textarea type="text" class="formdata" name="privacy_declaration" id="privacy_declaration">
-        {{ privacy_declaration }}
-    </textarea><br>
+    <textarea type="text" class="formdata" name="privacy_declaration" id="privacy_declaration">{{ privacy_declaration }}</textarea><br>
     <button id="submit" onclick="submit()">Änderungen speichern</button>
     <hr>
     <p><a href="{{ relroot }}manage">Management</a></p>

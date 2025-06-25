@@ -58,6 +58,7 @@ def checkTables(db):
             email_magazine BOOLEAN,
             allow_images_public BOOLEAN,
             allow_address_internal BOOLEAN,
+            memberships TEXT,
             note_public TEXT,
             note_manager TEXT,
             last_update DATE
@@ -71,26 +72,14 @@ def checkTables(db):
         raise
     # add colums added later; uncomment this some day!
     newColumns = [
-            'confession VARCHAR(64)',
-            'title_show BOOLEAN',
-            'qualification VARCHAR(128)',
-            'profession VARCHAR(128)',
-            'parents_family_name VARCHAR(64)',
-            'parents_given_name VARCHAR(64)',
-            'parents_street VARCHAR(64)',
-            'parents_street_number VARCHAR(8)',
-            'parents_appartment VARCHAR(64)',
-            'parents_postal_code VARCHAR(8)',
-            'parents_city VARCHAR(64)',
-            'parents_state VARCHAR(64)',
-            'parents_country VARCHAR(2)',
+            'memberships TEXT'
         ]
     for col in newColumns:
         sql_command = 'ALTER TABLE members ADD COLUMN '+col+';'
         try:
             cursor.execute(sql_command)
         except sqlite3.OperationalError as err:
-            print(str(err)) # obviously the column is existing already
+            pass #print(str(err)) # obviously the column is existing already
     
     sql_command = '''
         CREATE TABLE IF NOT EXISTS groups (

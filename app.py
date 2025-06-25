@@ -146,7 +146,7 @@ def admin():
     db = dbio.MbDb(dbfile)
     sJson = json.dumps({'dbfile':settings.get('dbfile'), 'host':settings.get('host'), 'port':settings.get('port'), 
             'debug':settings.get('debug'), 'organame':settings.get('organame'), 'magazine_name':settings.get('magazine_name')});
-    members = db.getMembers()
+    members = db.getMembers('')
     msJson = json.dumps(members, indent=2)
     groups = db.getGroups()
     gJson = json.dumps(groups, indent=2)
@@ -175,9 +175,22 @@ def manage():
     db = dbio.MbDb(dbfile)
     if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
         return '405 not allowed'
-    members = db.getMembers()
+    states = settings.get('states')
+    statesJson = json.dumps(states)
+    return render_template('manage.html', relroot='./', authuser=flask_login.current_user.id, statesJson=statesJson)
+
+@MemberBase.route('/manageList/<state>', methods=['GET'])
+@flask_login.login_required
+def manageList(state):
+    '''show member-lists for management according to state'''
+    user = flask_login.current_user.id
+    db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return '405 not allowed'
+    members = db.getMembers(state)
+    print(members)
     msJson = json.dumps(members, indent=2)
-    return render_template('manage.html', relroot='./', authuser=flask_login.current_user.id, msJson=msJson, magazine_name=settings.get('magazine_name'))
+    return render_template('manageList.html', relroot='../', authuser=flask_login.current_user.id, msJson=msJson, magazine_name=settings.get('magazine_name'), state=state)
 
 @MemberBase.route('/manage/<mid>', methods=['GET'])
 @flask_login.login_required
@@ -189,7 +202,7 @@ def manageMember(mid):
         return '405 not allowed'
     member = db.getMemberFull(mid)
     mJson = json.dumps(member, indent=2)
-    return render_template('manageMember.html', relroot='../', authuser=flask_login.current_user.id, mJson=mJson)
+    return render_template('manageMember.html', relroot='../', authuser=flask_login.current_user.id, mJson=mJson, states=json.dumps(settings.get('states')))
 
 @MemberBase.route('/member/<mid>', methods=['GET'])
 def member(mid):
@@ -245,7 +258,7 @@ def memberUpdate(mid):
 @MemberBase.route('/memberAdmin/<mid>', methods=['PUT'])
 @flask_login.login_required
 def memberUpdateAdmin(mid):
-    '''update a member'''
+    '''update a member as admin'''
     user = flask_login.current_user.id
     db = dbio.MbDb(dbfile)
     if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):

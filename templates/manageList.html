@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p id="nav" class="no-print" style="width:100%; background-color:080; text-align:right;">
+    &nbsp;
+</p>
+<div id="content">
+    <h1>MemberBase Management: Listen</h1>
+    <p><a href="_logout">logout</a></p>
+    <hr>
+    <h2>csv-Exporte</h2>
+    <p>TODO: Nach Status filtern (bislang: komplette Liste)!</p>
+    <h3>eMail-Verteiler</h3>
+    <ul>
+        <li><a href="{{ relroot }}csvExport/mail_n">Mailverteiler</a></li>
+        <li><a href="{{ relroot }}csvExport/mail_p">Protokoll</a></li>
+        <li><a href="{{ relroot }}csvExport/mail_m">{{ magazine_name }}</a></li>
+    </ul>
+    <h3>Adress-Verteiler</h3>
+    <ul>
+        <li><a href="{{ relroot }}csvExport/addr_p">Protokolle</a></li>
+        <li><a href="{{ relroot }}csvExport/addr_m">{{ magazine_name }}</a></li>
+        <li><a href="{{ relroot }}csvExport/addr_pm">Protokolle und {{ magazine_name }}</a></li>
+    </ul>
+    <h3>Änderungen</h3>
+    <ul>
+        <li><a href="{{ relroot }}log/address">Adress-Änderungen</a></li>
+    </ul>
+    <hr>
+    <h2>Alle Mitglieder mit Status "{{ state }}"</h2>
+    <div id="memberlist"></div>
+</div>
+
+<script src="{{ relroot }}_static/getFormJson.js"></script>
+<script src="{{ relroot }}_static/polalert.js"></script>
+
+<script>
+    var members = JSON.parse({{ msJson|tojson }});
+    var out = '<table>';
+    out += '<tr><th>Optionen</th><th>Nachname</th><th>Vorname</th><th>Geburtsdatum</th></tr>\n';
+    for (var i=0; i<members.length; i++){
+        out += '<tr>';
+        out += '<td><a href="{{ relroot }}manage/'+members[i].mid+'">Edit &#9998;</a></td>';
+        out += '<td><a href="{{ relroot }}member/'+members[i].mid+'">'+members[i].family_name+'</a></td>';
+        out += '<td>'+members[i].given_name+'</td>';
+        out += '<td>'+members[i].date_of_birth+'</td>';
+        out += '</tr>';
+    }
+    out += '</table>';
+    document.getElementById('memberlist').innerHTML = out;
+</script>
+{% endblock %}

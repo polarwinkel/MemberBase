@@ -16,6 +16,7 @@ class settingsIo:
             s['debug'] = True
             s['organame'] = 'society'
             s['magazine_name'] = 'magazine'
+            s['states'] = ''
             s['privacy_declaration'] = ''
             s['admin']=''
             s['secret_key']=uuid.uuid4().hex
@@ -41,6 +42,8 @@ class settingsIo:
             return self.s['organame']
         elif key=='magazine_name':
             return self.s['magazine_name']
+        elif key=='states':
+            return self.s['states'].splitlines()
         elif key=='privacy_declaration':
             return self.s['privacy_declaration'].strip()
         elif key=='admin':

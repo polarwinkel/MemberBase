@@ -5,4 +5,4 @@ Online Mitglieder-Datenbank und Mitgliederverwaltung für Vereine
 
 ## work in progress...!
 
-Diese Software ist noch nicht für den Produktiveinsatz geeignet.
+Diese Software ist ~noch nicht für den Produktiveinsatz geeignet~ im __Alpha-Stadium__. Einige wichtige Features fehlen noch, sie wird aber von mir schon produktiv eingesetzt, ein stabiler Upgrade-Pfad wird angestrebt, jedoch nicht garantiert.

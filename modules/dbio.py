@@ -262,12 +262,12 @@ class MbDb:
                 })
         return result
     
-    def getMembers(self, gid=''):
-        '''returns a list of all members [with a certain group]'''
+    def getMembers(self, state, gid=''):
+        '''returns a list of all members with certain state [or with certain group]'''
         cursor = self._connection.cursor()
         if gid=='':
-            sqlTemplate = '''SELECT mid, family_name, given_name, date_of_birth FROM members'''
-            cursor.execute(sqlTemplate, )
+            sqlTemplate = '''SELECT mid, family_name, given_name, date_of_birth FROM members WHERE status=?'''
+            cursor.execute(sqlTemplate, (state, ))
         else:
             sqlTemplate = '''SELECT members.mid, members.family_name, members.given_name, members.date_of_birth 
                     FROM members JOIN group_members ON members.mid=group_members.mid
