@@ -64,7 +64,7 @@ class MbDb:
     def getMember(self, mid):
         '''returns most information of a member'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT mid, family_name,given_name,date_of_birth,place_of_birth,birth_name,title,title_show,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,privacy_accepted,allow_address_internal,note_public,note_manager,last_update
+        sqlTemplate = '''SELECT mid, family_name,given_name,date_of_birth,place_of_birth,birth_name,title,title_show,call_name,sex,street,street_number,appartment,postal_code,city,state,country,geo_lat,geo_lon,email,phone,mobile,iban,bic,join_date,status,privacy_accepted,allow_debit,email_newsletter,email_protocols,email_magazine,allow_images_public,privacy_accepted,allow_email_internal,allow_address_internal,allow_city_internal,note_public,note_manager,last_update
                 FROM members WHERE mid LIKE ?'''
         cursor.execute(sqlTemplate, (mid+'%', ))
         m = cursor.fetchone()
@@ -131,12 +131,24 @@ class MbDb:
             m['privacy_accepted'] = None
         else:
             m['privacy_accepted']=0
+        if m['allow_email_internal'] in ['on', 1, '1', True, 'true', 'True']:
+            m['allow_email_internal']=1
+        elif m['allow_email_internal'] in ['', 'null', 'Null', 'NULL', None]:
+            m['allow_email_internal'] = None
+        else:
+            m['allow_email_internal']=0
         if m['allow_address_internal'] in ['on', 1, '1', True, 'true', 'True']:
             m['allow_address_internal']=1
         elif m['allow_address_internal'] in ['', 'null', 'Null', 'NULL', None]:
             m['allow_address_internal'] = None
         else:
             m['allow_address_internal']=0
+        if m['allow_city_internal'] in ['on', 1, '1', True, 'true', 'True']:
+            m['allow_city_internal']=1
+        elif m['allow_city_internal'] in ['', 'null', 'Null', 'NULL', None]:
+            m['allow_city_internal'] = None
+        else:
+            m['allow_city_internal']=0
         return m
     
     def log(self, user, ip, mNew):
@@ -183,13 +195,13 @@ class MbDb:
         cursor = self._connection.cursor()
         sqlTemplate = '''UPDATE members SET title=?, title_show=?, call_name=?, 
                 street=?, street_number=?, appartment=?, postal_code=?, city=?, 
-                email_newsletter=?, email_protocols=?, email_magazine=?, 
-                privacy_accepted=?, allow_address_internal=?, geo_lat=?, geo_lon=?
+                email_newsletter=?, email_protocols=?, email_magazine=?, privacy_accepted=?, 
+                allow_email_internal=?, allow_address_internal=?, allow_city_internal=?, geo_lat=?, geo_lon=?
                 WHERE mid=?'''
         cursor.execute(sqlTemplate, (m['title'], m['title_show'], m['call_name'], m['street'], m['street_number'], 
                 m['appartment'], m['postal_code'], m['city'], 
-                m['email_newsletter'], m['email_protocols'], m['email_magazine'], 
-                m['privacy_accepted'], m['allow_address_internal'], m['geo_lat'], m['geo_lon'], 
+                m['email_newsletter'], m['email_protocols'], m['email_magazine'], m['privacy_accepted'], 
+                m['allow_email_internal'], m['allow_address_internal'], m['allow_city_internal'], m['geo_lat'], m['geo_lon'], 
                 m['mid']))
         if len(m['password'])>=10:
             salt = uuid.uuid4().hex
@@ -294,7 +306,7 @@ class MbDb:
         '''returns a list of all allowed member-locations'''
         cursor = self._connection.cursor()
         sqlTemplate = '''SELECT given_name, call_name, geo_lat, geo_lon FROM members
-                WHERE geo_lat NOT NULL AND allow_address_internal=1'''
+                WHERE geo_lat NOT NULL AND (allow_address_internal=1 OR allow_city_internal=1)'''
         cursor.execute(sqlTemplate, )
         tup = cursor.fetchall()
         self._connection.commit()

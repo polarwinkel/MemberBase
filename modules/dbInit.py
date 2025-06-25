@@ -31,9 +31,28 @@ def checkTables(db):
             city VARCHAR(64),
             state VARCHAR(64),
             country VARCHAR(2),
+            email VARCHAR(64),
+            secret VARCHAR(64),
+            pwsalt VARCHAR(64),
+            pwhash VARCHAR(256),
+            phone VARCHAR(16),
+            mobile VARCHAR(16),
+            privacy_accepted BOOLEAN,
+            allow_images_public BOOLEAN,
+            allow_email_internal BOOLEAN,
+            allow_address_internal BOOLEAN,
+            allow_city_internal BOOLEAN,
             geo_lat VARCHAR(16),
             geo_lon VARCHAR(16),
-            email VARCHAR(64),
+            email_newsletter BOOLEAN,
+            email_protocols BOOLEAN,
+            email_magazine BOOLEAN,
+            iban VARCHAR(32),
+            bic VARCHAR(32),
+            allow_debit BOOLEAN,
+            join_date DATE,
+            status VARCHAR(256),
+            memberships TEXT,
             parents_family_name VARCHAR(64),
             parents_given_name VARCHAR(64),
             parents_street VARCHAR(64),
@@ -43,23 +62,6 @@ def checkTables(db):
             parents_city VARCHAR(64),
             parents_state VARCHAR(64),
             parents_country VARCHAR(2),
-            secret VARCHAR(64),
-            pwsalt VARCHAR(64),
-            pwhash VARCHAR(256),
-            phone VARCHAR(16),
-            mobile VARCHAR(16),
-            iban VARCHAR(32),
-            bic VARCHAR(32),
-            join_date DATE,
-            status VARCHAR(256),
-            privacy_accepted BOOLEAN,
-            allow_debit BOOLEAN,
-            email_newsletter BOOLEAN,
-            email_protocols BOOLEAN,
-            email_magazine BOOLEAN,
-            allow_images_public BOOLEAN,
-            allow_address_internal BOOLEAN,
-            memberships TEXT,
             note_public TEXT,
             note_manager TEXT,
             last_update DATE
@@ -73,7 +75,8 @@ def checkTables(db):
         raise
     # add colums added later; uncomment this some day!
     newColumns = [
-            'place_of_birth VARCHAR(64)'
+            'allow_email_internal BOOLEAN',
+            'allow_city_internal BOOLEAN'
         ]
     for col in newColumns:
         sql_command = 'ALTER TABLE members ADD COLUMN '+col+';'

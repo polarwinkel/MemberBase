@@ -50,8 +50,12 @@
     <input type="checkbox" class="formdata" name="privacy_accepted" id="privacy_accepted"><br><br>
     <h3>Interne Sichtbarkeit</h3>
     <p>Möchtest du, dass andere Mitglieder deine Adresse über deinen Rufnamen oder, falls der nicht vergeben ist, über den Vornamen nachschauen können?</p>
+    <label for="allow_email_internal">eMail sichtbar:</label>
+    <input type="checkbox" class="formdata" name="allow_email_internal" id="allow_email_internal"><br>
     <label for="allow_address_internal">Adresse sichtbar:</label>
-    <input type="checkbox" class="formdata" name="allow_address_internal" id="allow_address_internal"><br>
+    <input type="checkbox" class="formdata" name="allow_address_internal" id="allow_address_internal" onchange="document.getElementById('allow_city_internal').checked=false;"><br>
+    <label for="allow_city_internal">nur Stadt sichtbar:</label>
+    <input type="checkbox" class="formdata" name="allow_city_internal" id="allow_city_internal" onchange="document.getElementById('allow_address_internal').checked=false;"><br>
     <input type="hidden" class="formdata" name="geo_lat" id="geo_lat">
     <input type="hidden" class="formdata" name="geo_lon" id="geo_lon">
     <h3>Passwort einrichten</h3>
@@ -75,8 +79,8 @@
     <hr>
     
     <h2>Andere Mitglieder</h2>
-    <p>Hier siehst du die Wohnorte aller Mitglieder, die der Sichtbarkeit der eigenen Adresse zugestimmt haben.<br>
-    Eine Suchmöglichkeit nach Mitgliedern ist noch in Planung.<br>
+    <p>Hier siehst du die Wohnorte aller Mitglieder, die der internen Sichtbarkeit zugestimmt haben.<br>
+    TODO: Eine Suchmöglichkeit nach Mitgliedern und ihrer eMail-Adressen (bei Zustimmung) ist noch in Planung!<br>
     <i>(Nach Änderungen oben diese Seite einmal neu laden!)</i></p>
     <div id="mapd">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -120,7 +124,9 @@
         document.getElementById('email_protocols').checked = m.email_protocols;
         document.getElementById('email_magazine').checked = m.email_magazine;
         document.getElementById('privacy_accepted').checked = m.privacy_accepted;
+        document.getElementById('allow_email_internal').checked = m.allow_email_internal;
         document.getElementById('allow_address_internal').checked = m.allow_address_internal;
+        document.getElementById('allow_city_internal').checked = m.allow_city_internal;
         document.getElementById('geo_lat').checked = m.geo_lat;
         document.getElementById('geo_lon').checked = m.geo_lon;
     }
@@ -148,7 +154,11 @@
         let street_number=document.getElementById('street_number').value.trim().replaceAll(' ', '+');
         let city=document.getElementById('city').value.trim().replaceAll(' ', '+');
         let request = new XMLHttpRequest();
-        request.open('GET', 'https://nominatim.openstreetmap.org/search?street='+street+'+'+street_number+'&city='+city+'&format=json', true);
+        if (document.getElementById('allow_address_internal').checked) {
+            request.open('GET', 'https://nominatim.openstreetmap.org/search?street='+street+'+'+street_number+'&city='+city+'&format=json', true);
+        } else if (document.getElementById('allow_city_internal').checked) {
+            request.open('GET', 'https://nominatim.openstreetmap.org/search?city='+city+'&format=json', true);
+        }
         request.onload = () => {
             let res = JSON.parse(request.responseText);
             if (res.length>0) {
@@ -182,7 +192,7 @@
             pa.error('Du musst die Datenschutzbestimmung akzeptieren um hier Einstellungen vornehmen zu können!');
             return;
         }
-        if (document.getElementById('allow_address_internal').checked) {
+        if (document.getElementById('allow_address_internal').checked || document.getElementById('allow_city_internal').checked ) {
             try {
                 getGeo();
             } catch {
