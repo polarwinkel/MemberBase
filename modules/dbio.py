@@ -160,11 +160,11 @@ class MbDb:
         email = 0
         payment = 0
         for key in lNew:
-            if key in ['family_name','given_name','title','street','street_number','appartment','postal_code','city','state','country']:
+            if key in ['family_name','given_name','title','street','street_number','appartment','postal_code','city','state','country','status']:
                 address = 1
-            if key == 'email':
+            if key in ['email', 'status']:
                 email = 1
-            if key in ['iban','bic','allow_debit']:
+            if key in ['iban','bic','allow_debit','status','memberships']:
                 payment = 1
         cursor = self._connection.cursor()
         sqlTemplate = '''INSERT INTO log 

@@ -271,7 +271,7 @@ def memberUpdate(mid):
 @MemberBase.route('/memberAdmin/<mid>', methods=['PUT'])
 @flask_login.login_required
 def memberUpdateAdmin(mid):
-    '''update a member as admin'''
+    '''update a member as admin or manager'''
     user = flask_login.current_user.id
     db = dbio.MbDb(dbfile)
     if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):

@@ -5,8 +5,8 @@ Online Mitglieder-Datenbank und Mitgliederverwaltung für Vereine
 
 ## Beta-Status
 
-Diese Software ist ~noch nicht für den Produktiveinsatz geeignet~ im __Beta-Stadium__.
-Alle wirklich wichtigen Features sind implementiert werden im Produktivbetrieb getestet.
+Diese Software ist im __Beta-Stadium__.
+Alle wirklich wichtigen Features sind implementiert und werden gerade im Produktivbetrieb getestet.
 
 ## Installation
 
