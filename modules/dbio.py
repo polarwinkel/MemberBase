@@ -161,10 +161,13 @@ class MbDb:
                 lOld[key] = mOld[key]
                 lNew[key] = mNew[key]
             if key=='password' and len(mNew['password'])>=10:
-                if mOld['pwhash'] == None:
-                    lOld['password'] = 'null'
-                else:
-                    lOld['password'] = '[set]'
+                try:
+                    if mOld['pwhash'] == None:
+                        lOld['password'] = 'null'
+                    else:
+                        lOld['password'] = '[set]'
+                except KeyError:
+                    lOld['password'] = '[unknown]'
                 lNew['password'] = '[new password]'
         if lOld == {} and lNew == {}:
             return False
