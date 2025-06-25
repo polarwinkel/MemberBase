@@ -194,12 +194,12 @@ class MbDb:
         # update:
         cursor = self._connection.cursor()
         sqlTemplate = '''UPDATE members SET title=?, title_show=?, call_name=?, 
-                street=?, street_number=?, appartment=?, postal_code=?, city=?, 
+                street=?, street_number=?, appartment=?, postal_code=?, city=?, email=?, 
                 email_newsletter=?, email_protocols=?, email_magazine=?, privacy_accepted=?, 
                 allow_email_internal=?, allow_address_internal=?, allow_city_internal=?, geo_lat=?, geo_lon=?
                 WHERE mid=?'''
         cursor.execute(sqlTemplate, (m['title'], m['title_show'], m['call_name'], m['street'], m['street_number'], 
-                m['appartment'], m['postal_code'], m['city'], 
+                m['appartment'], m['postal_code'], m['city'], m['email'], 
                 m['email_newsletter'], m['email_protocols'], m['email_magazine'], m['privacy_accepted'], 
                 m['allow_email_internal'], m['allow_address_internal'], m['allow_city_internal'], m['geo_lat'], m['geo_lon'], 
                 m['mid']))
