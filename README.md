@@ -11,10 +11,11 @@ Alle wirklich wichtigen Features sind implementiert und werden gerade im Produkt
 ## Installation
 
 Auf einem Debian(-basierten) System kann als `root` die `install.sh`-Datei ausgeführt werden:
+
 Mit `sudo chmod +x install.sh` ausführbar machen, dann mit `./install.sh` ausführen.
 
-Umdates werden genauso installiert.
+Updates werden genauso installiert.
 
-MemberBase läuft dann als system-Service und ist im Browser des Servers unter `localhost:4208` aufrufbar.
+MemberBase läuft dann als system-Service und ist im Browser auf dem Server unter `http://localhost:4208` aufrufbar.
 
-Für externen Zugriff ist ein ReverseProxy wie z.B. `nginx` zu installieren, der sinnvollerweise auch die Verschlüsselung übernimmt.
+Für externen Zugriff ist ein ReverseProxy wie z.B. `nginx` zu installieren, der sinnvollerweise auch die Verschlüsselung z.B. mit Let's Encrypt-Zertifikat übernimmt. Anleitungen dazu finden sich reichlich im Netz oder es lässt sich mit Hilfe des Lieblings-Spachmodells umsetzen.
