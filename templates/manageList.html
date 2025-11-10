@@ -8,6 +8,13 @@
     <h1>MemberBase Management: Listen {{ status }}</h1>
     <p><a href="_logout">logout</a></p>
     <hr>
+    <h2>Adress-Label für</h3>
+    <ul>
+        <li><a href="{{ relroot }}labelExport/{{ status }}/addr_p">Protokolle</a></li>
+        <li><a href="{{ relroot }}labelExport/{{ status }}/addr_m">{{ magazine_name }}</a></li>
+        <li><a href="{{ relroot }}labelExport/{{ status }}/addr_pm">Protokolle und {{ magazine_name }}</a></li>
+    </ul>
+    <p>(Die Label sind für den Druck auf Avery Zweckform 3490 ausgelegt.)</p>
     <h2>csv-Exporte</h2>
     <h3>eMail-Verteiler für</h3>
     <ul>

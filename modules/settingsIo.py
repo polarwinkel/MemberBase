@@ -15,6 +15,7 @@ class settingsIo:
             s['port'] = '4208'
             s['debug'] = True
             s['organame'] = 'society'
+            s['address'] = ''
             s['magazine_name'] = 'magazine'
             s['states'] = ''
             s['privacy_declaration'] = ''
@@ -40,6 +41,8 @@ class settingsIo:
             return self.s['debug']
         elif key=='organame':
             return self.s['organame']
+        elif key=='address':
+            return self.s['address']
         elif key=='magazine_name':
             return self.s['magazine_name']
         elif key=='states':

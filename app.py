@@ -15,6 +15,7 @@ from jinja2 import Template
 from modules import dbio, settingsIo
 from datetime import datetime, timedelta
 from markdown import markdown as md2html
+import pycountry
 
 # global settings:
 
@@ -376,6 +377,41 @@ def csvExport(status, selection):
             as_attachment=True,
             mimetype='text/csv',
             )
+
+@MemberBase.route('/labelExport/<status>/<selection>', methods=['GET'])
+@flask_login.login_required
+def labelExport(status, selection):
+    '''exports members as labels (TODO: Work in Progress...)'''
+    user = flask_login.current_user.id
+    db = dbio.MbDb(dbfile)
+    if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
+        return '405 not allowed'
+    sel = selection.split('_')
+    if sel[0] == 'mail':
+        data = db.csvExportMail(status, sel[1])
+    elif sel[0] == 'addr':
+        data = db.dataExportAddr(status, sel[1])
+    else:
+        return '404 not found'
+    count = 0
+    out = '<div class="sheet">'
+    for d in data:
+        count += 1
+        if count > 24:
+            out += '</div><div class="sheet">'
+            count = 1
+        out += '<div class="al3490">'
+        out += '<p style="font-size:7pt; border-bottom: 0.5px solid black;">'+settings.get('address')+'</p>'
+        out += d[2]+' '+d[1]+' '+d[0]+'<br>'
+        out += d[4]+' '+d[5]+'<br>'
+        if d[6] != '':
+            out += d[6]+'<br>'
+        out += d[7]+' '+d[8]
+        if d[9]!= 'DE' and d[9]!='':
+            out += '<br><b>'+str(pycountry.countries.get(alpha_2=d[9]).name)+'</b>'
+        out += '</div>'
+    out += '</div>'
+    return render_template('print3490.html', content=out)
 
 @MemberBase.route('/_deleteMember/<mid>', methods=['DELETE'])
 @flask_login.login_required

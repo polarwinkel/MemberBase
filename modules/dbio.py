@@ -409,6 +409,25 @@ class MbDb:
         f.seek(0) # get cursor to beginning
         return f
     
+    def dataExportAddr(self, status, sel):
+        '''export member-list according to the selection'''
+        cursor = self._connection.cursor()
+        if sel == 'p':
+            where = 'WHERE (status=?) AND (email_protocols=0 OR email_protocols IS NULL)'
+        elif sel == 'm':
+            where = 'WHERE (status=?) AND (email_magazine=0 OR email_magazine IS NULL)'
+        elif sel == 'pm':
+            where = 'WHERE (status=?) AND (email_protocols=0 OR email_protocols IS NULL OR email_magazine=0 OR email_magazine IS NULL)'
+        sqlTemplate = '''SELECT family_name, given_name, title, sex, street, street_number, appartment, postal_code, city, country
+                FROM members {where} ORDER BY
+                REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+                family_name,'ä','ae'),'ö','oe'),'ü','ue'),'Ä','Ae'),'Ö','Oe'),'Ü','Ue'),'ß','ss'), 
+                REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+                given_name,'ä','ae'),'ö','oe'),'ü','ue'),'Ä','Ae'),'Ö','Oe'),'Ü','Ue'),'ß','ss') '''.format(where=where)
+        cursor.execute(sqlTemplate, (status, ))
+        mlist = cursor.fetchall()
+        return mlist
+    
     def csvExportAddr(self, status, sel):
         '''export member-list according to the selection'''
         cursor = self._connection.cursor()
