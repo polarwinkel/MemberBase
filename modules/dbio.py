@@ -327,33 +327,23 @@ class MbDb:
             result.append(m)
         return result
     
-    def getNotMembers(self, gid):
-        '''returns a list of all non-members of a group'''
+    def getGMembers(self, gid):
+        '''returns a list of all member-ids of a group'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''SELECT mid, family_name, given_name, date_of_birth
-                FROM members WHERE mid NOT IN
-                (SELECT mid FROM group_members WHERE gid=?)
-                ORDER BY family_name, given_name'''
+        sqlTemplate = '''SELECT mid FROM group_members WHERE gid=?'''
         cursor.execute(sqlTemplate, (gid, ))
-        tup = cursor.fetchall()
+        tup = [item for item, in cursor.fetchall()]
         self._connection.commit()
-        if tup is None:
-            return None
-        result = []
-        for t in tup:
-            result.append({
-                    'mid'           : t[0],
-                    'family_name'   : t[1],
-                    'given_name'    : t[2],
-                    'date_of_birth' : t[3]
-                })
-        return result
+        return tup
     
-    def addGroupMember(self, gid, mid):
-        '''adds a member to a group'''
+    def addRmGroupMember(self, gid, mid):
+        '''adds or removes a member to/from a group'''
         cursor = self._connection.cursor()
-        sqlTemplate = '''INSERT INTO group_members (gid, mid)
-                VALUES (?, ?)'''
+        if mid not in self.getGMembers(gid):
+            sqlTemplate = '''INSERT INTO group_members (gid, mid)
+                    VALUES (?, ?)'''
+        else:
+            sqlTemplate = '''DELETE FROM group_members WHERE gid=? AND mid=?'''
         cursor.execute(sqlTemplate, (gid, mid))
         self._connection.commit()
         return 'ok'

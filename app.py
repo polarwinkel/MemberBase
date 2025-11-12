@@ -146,7 +146,9 @@ def admin():
         return '405 not allowed'
     db = dbio.MbDb(dbfile)
     sJson = json.dumps({'dbfile':settings.get('dbfile'), 'host':settings.get('host'), 'port':settings.get('port'), 
-            'debug':settings.get('debug'), 'organame':settings.get('organame'), 'magazine_name':settings.get('magazine_name')});
+            'debug':settings.get('debug'), 'organame':settings.get('organame'), 
+            'address':settings.get('address'), 'magazine_name':settings.get('magazine_name'), 
+            'states':settings.get('states')});
     members = db.getMembers('')
     msJson = json.dumps(members, indent=2)
     groups = db.getGroups()
@@ -324,21 +326,21 @@ def group(gid):
         return '405 not allowed'
     gname = db.getGroupName(gid)
     gmembers = db.getMembers(status='', gid=gid)
-    gNmembers = db.getNotMembers(gid)
+    allMembers = db.getMembers()
     gmJson = json.dumps(gmembers, indent=2)
-    gnmJson = json.dumps(gNmembers, indent=2)
-    return render_template('group.html', relroot='../', authuser=flask_login.current_user.id, gmJson=gmJson, gnmJson=gnmJson, gname=gname, gid=gid)
+    amJson = json.dumps(allMembers, indent=2)
+    return render_template('group.html', relroot='../', authuser=flask_login.current_user.id, gmJson=gmJson, amJson=amJson, gname=gname, gid=gid)
 
-@MemberBase.route('/group/addMember', methods=['PUT'])
+@MemberBase.route('/group/addRmMember', methods=['PUT'])
 @flask_login.login_required
-def groupAddMember():
+def groupAddRmMember():
     '''show group'''
     user = flask_login.current_user.id
     db = dbio.MbDb(dbfile)
     if flask_login.current_user.id != settings.get('admin') and not db.checkManager(user):
         return '405 not allowed'
     job = request.json
-    db.addGroupMember(job['gid'], job['addMember'])
+    db.addRmGroupMember(job['gid'], job['addRmMember'])
     return 'ok'
 
 @MemberBase.route('/log/<dataset>', methods=['GET'])

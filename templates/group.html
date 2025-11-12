@@ -10,8 +10,8 @@
     <h2>Alle Mitglieder</h2>
     <div id="gmlist"></div>
     <input type="hidden" class="formdata" name="gid" id="gid" value="{{ gid }}">
-    <label for="addMember">Mitglied hinzufügen:</label>
-    <select class="formdata" name="addMember" id="addMember">
+    <label for="addRmMember">Mitglied hinzufügen:</label>
+    <select class="formdata" name="addRmMember" id="addRmMember">
         <option value="">-</option>
     </select>
     <input type="submit" onclick="submit()">
@@ -23,30 +23,30 @@
 <script>
     var relroot = '{{ relroot }}';
     var gm = JSON.parse({{ gmJson|tojson }});
-    var gnm = JSON.parse({{ gnmJson|tojson }});
+    var am = JSON.parse({{ amJson|tojson }});
     var out = '<table>';
     out += '<tr><th>family_name</th><th>given_name</th></tr>\n';
     for (var i=0; i<gm.length; i++){
         out += '<tr>';
-        out += '<td><a href="{{ relroot }}group/'+gm[i].mid+'">'+gm[i].family_name+'</a></td>';
+        out += '<td><a href="{{ relroot }}member/'+gm[i].mid+'">'+gm[i].family_name+'</a></td>';
         out += '<td>'+gm[i].given_name+'</td>';
         out += '</tr>';
     }
     out += '</table>';
     document.getElementById('gmlist').innerHTML = out;
     
-    var addMember = document.getElementById('addMember');
-    for (var i = 0; i<gnm.length; i++){
+    var addRmMember = document.getElementById('addRmMember');
+    for (var i = 0; i<am.length; i++){
         var opt = document.createElement('option');
-        opt.value = gnm[i].mid;
-        opt.innerHTML = gnm[i].given_name+' '+gnm[i].family_name;
-        addMember.appendChild(opt);
+        opt.value = am[i].mid;
+        opt.innerHTML = am[i].given_name+' '+am[i].family_name;
+        addRmMember.appendChild(opt);
     }
     
     async function submit() {
         // send form to server
         var formJson = getFormJson();
-        var postUrl = 'addMember';
+        var postUrl = 'addRmMember';
         try{
             const response = await fetch(postUrl, {
                 method: 'PUT',

@@ -42,7 +42,10 @@ class settingsIo:
         elif key=='organame':
             return self.s['organame']
         elif key=='address':
-            return self.s['address']
+            try:
+                return self.s['address']
+            except:
+                return '' #TODO: remove after a while (upgrade path...)
         elif key=='magazine_name':
             return self.s['magazine_name']
         elif key=='states':
