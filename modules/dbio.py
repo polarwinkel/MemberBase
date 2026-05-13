@@ -13,7 +13,7 @@ import huuid
 
 class MbDb:
     ''' Database-Connection '''
-    def __init__(self, dbfile):
+    def __init__(self, dbfile, states=None):
         if not os.path.exists(dbfile):
             connection = sqlite3.connect(dbfile)
             cursor = connection.cursor()
@@ -23,7 +23,8 @@ class MbDb:
             connection.commit()
             connection.close()
         self._connection = sqlite3.connect(dbfile) # _x = potected, __ would be private
-        dbInit.checkTables(self)
+        if states is not None:
+            dbInit.checkTables(self, states)
     
     def reloadDb(self, dbfile):
         '''reloads the database file, i.e. after external changes/sync'''

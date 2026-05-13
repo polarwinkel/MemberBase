@@ -12,7 +12,8 @@
     <p><a href="{{ relroot }}log/all">log</a></p>
     <p><a href="{{ relroot }}_csvImport">csvImport</a></p>
     <hr>
-    <h2>Alle Gruppen</h2>
+    <h2>Berechtigungs-Gruppen</h2>
+    <p><i>(<code>management</code>-Mitglieder dürfen alle Daten bearbeiten, für jede Status-Gruppe können zusätzlich Einzelrechte vergeben werden)</i></p>
     <div id="grouplist"></div>
     <hr>
     <h2>Admin-Einstellungen</h2>
@@ -35,7 +36,8 @@
     <label for="states">Stati:</label>
     <textarea type="text" class="formdata" name="states" id="states"></textarea><br>
     <p>Hinweis: Jedes Mitglied kann <i>maximal einen Status</i> haben, z.B. "Aktiv", "Fördermitglied" o.ä.! Weitere Informationen können über Hinweise z.B. im Feld <code>note_public</code> oder <code>note_manager</code> oder ggf. zukünftig über Gruppen abgebildet werden.<br>
-    Die Stati-Namen <i>nicht</i> nachträglich ändern, allenfalls erweitern und nur leere löschen!</p>
+    Die Stati-Namen <i>nicht</i> nachträglich ändern, allenfalls erweitern und nur leere löschen!<br>
+    Für die Stati werden Berechtigungs-Gruppen angelegt, der Name <code>management</code> ist vorgesehen für Daten-Manager mit vollem Datenzugriff unterhalb des <code>admin</code>.</p>
     <label for="privacy_declaration">Datenschutz-Erklärung:</label>
     <textarea type="text" class="formdata" name="privacy_declaration" id="privacy_declaration">{{ privacy_declaration }}</textarea><br>
     <button id="submit" onclick="submit()">Änderungen speichern</button>

@@ -410,7 +410,10 @@ def labelExport(status, selection):
             out += d[6]+'<br>'
         out += d[7]+' '+d[8]
         if d[9]!= 'DE' and d[9]!='':
-            out += '<br><b>'+str(pycountry.countries.get(alpha_2=d[9]).name)+'</b>'
+            try:
+                out += '<br><b>'+str(pycountry.countries.get(alpha_2=d[9]).name)+'</b>'
+            except AttributeError:
+                out += '<br><b>'+str(d[9])+'</b>'
         out += '</div>'
     out += '</div>'
     return render_template('print3490.html', content=out)
@@ -427,4 +430,5 @@ def deleteMember(mid):
 # run it:
 
 if __name__ == "__main__":
+    dbio.MbDb(dbfile, settings.get('states'))
     MemberBase.run(host=host, debug=debug)

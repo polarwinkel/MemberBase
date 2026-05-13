@@ -5,8 +5,9 @@ Database-IO-file
 
 import sqlite3
 import os
+import huuid
 
-def checkTables(db):
+def checkTables(db, states):
     ''' makes sure default tables exist in the Database '''
     cursor = db._connection.cursor()
     sql_command = '''
@@ -73,22 +74,13 @@ def checkTables(db):
         args.append('Failed to create members table')
         err.args = tuple(args)
         raise
-    # add colums added later; uncomment this some day!
-    newColumns = [
-            'allow_email_internal BOOLEAN',
-            'allow_city_internal BOOLEAN'
-        ]
-    for col in newColumns:
-        sql_command = 'ALTER TABLE members ADD COLUMN '+col+';'
-        try:
-            cursor.execute(sql_command)
-        except sqlite3.OperationalError as err:
-            pass #print(str(err)) # obviously the column is existing already
     
     sql_command = '''
         CREATE TABLE IF NOT EXISTS groups (
             gid VARCHAR(64) NOT NULL PRIMARY KEY,
-            group_name VARCHAR(64) UNIQUE
+            group_name VARCHAR(64) UNIQUE,
+            permission CHAR,
+            status VARCHAR(64)
         );'''
     try:
         cursor.execute(sql_command)
@@ -97,18 +89,21 @@ def checkTables(db):
         args.append('Failed to create groups table')
         err.args = tuple(args)
         raise
-    sql_command = '''SELECT gid FROM groups WHERE group_name='management' '''
-    cursor.execute(sql_command)
-    gid = cursor.fetchone()
-    if gid==None:
-        import huuid
-        sql_command = '''INSERT INTO groups (gid, group_name) VALUES (?,?) '''
-        cursor.execute(sql_command, (huuid.new(), 'management'))
+    # create initial permission-groups for management and all configures states:
+    states.append('management')
+    for group in states:
+        sql_command = '''SELECT gid FROM groups WHERE group_name=? '''
+        cursor.execute(sql_command, (group, ))
+        gid = cursor.fetchone()
+        if gid==None:
+            sql_command = '''INSERT INTO groups (gid, group_name) VALUES (?,?) '''
+            cursor.execute(sql_command, (huuid.new(), group))
     
     sql_command = '''
         CREATE TABLE IF NOT EXISTS group_members (
             mid INTEGER NOT NULL,
-            gid INTEGER NOT NULL
+            gid INTEGER NOT NULL,
+            permission VARCHAR(64)
         );'''
     try:
         cursor.execute(sql_command)
@@ -117,6 +112,17 @@ def checkTables(db):
         args.append('Failed to create group_members table')
         err.args = tuple(args)
         raise
+    # add colums added later; uncomment this some day!
+    newColumns = [
+            'permission VARCHAR(64)'
+        ]
+    for col in newColumns:
+        sql_command = 'ALTER TABLE group_members ADD COLUMN '+col+';'
+        try:
+            cursor.execute(sql_command)
+        except sqlite3.OperationalError as err:
+            pass #print(str(err)) # obviously the column is existing already
+    
     
     sql_command = '''
         CREATE TABLE IF NOT EXISTS log (
